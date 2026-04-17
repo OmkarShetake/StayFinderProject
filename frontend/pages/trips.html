@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Trips — StayFinder</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/nav.css">
+  <link rel="stylesheet" href="../css/host.css">
+  <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo" id="nav-logo">stayfinder</div>
+  <div class="nav-right">
+    <button class="nav-link" id="btn-explore">Explore</button>
+    <div class="nav-user" id="nav-user-btn" style="position:relative">
+      <div class="nav-ham">☰</div>
+      <div class="nav-avatar" id="nav-avatar"></div>
+      <div class="notif-dot hidden"></div>
+
+      <!-- Dropdown menu -->
+      <div class="nav-dropdown" id="nav-dropdown">
+        <div class="nav-dropdown-user hidden" id="nav-dropdown-user">
+          <div class="nav-dropdown-avatar" id="nav-dropdown-avatar"></div>
+          <div>
+            <div class="nav-dropdown-name" id="nav-dropdown-name"></div>
+            <div class="nav-dropdown-email" id="nav-dropdown-email"></div>
+          </div>
+        </div>
+        <div class="nav-dropdown-section hidden" id="nav-dropdown-guest">
+          <button class="nav-dropdown-item" id="nav-dropdown-login">
+            <span class="nav-dropdown-item-icon">🔑</span> Log in
+          </button>
+        </div>
+        <div class="nav-dropdown-section hidden" id="nav-dropdown-auth">
+          <button class="nav-dropdown-item" id="nav-dropdown-trips">
+            <span class="nav-dropdown-item-icon">🧳</span> My trips
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-wishlist">
+            <span class="nav-dropdown-item-icon">❤️</span> Wishlists
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-host-link">
+            <span class="nav-dropdown-item-icon">🏠</span> Host dashboard
+          </button>
+        </div>
+        <div class="hidden" id="nav-dropdown-logout-wrap">
+          <button class="nav-dropdown-logout" id="nav-logout">
+            <span class="nav-dropdown-logout-icon">👋</span> Log out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div style="max-width:900px;margin:0 auto;padding:40px 24px">
+  <h1 style="margin-bottom:8px">My trips</h1>
+  <p class="text-muted" style="margin-bottom:32px">Your upcoming and past stays</p>
+
+  <!-- Filter tabs -->
+  <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px">
+    <button class="tab-btn active" data-filter="all" onclick="Trips.filter('all',this)">All</button>
+    <button class="tab-btn" data-filter="CONFIRMED" onclick="Trips.filter('CONFIRMED',this)">Upcoming</button>
+    <button class="tab-btn" data-filter="COMPLETED" onclick="Trips.filter('COMPLETED',this)">Completed</button>
+    <button class="tab-btn" data-filter="CANCELLED" onclick="Trips.filter('CANCELLED',this)">Cancelled</button>
+  </div>
+
+  <div id="trips-list"></div>
+</div>
+
+<!-- Review Modal -->
+<div class="modal-overlay hidden" id="review-modal">
+  <div class="modal" style="width:500px">
+    <button class="modal-close" onclick="Utils.hideModal('review-modal')">✕</button>
+    <h3 style="margin-bottom:20px">Write a review</h3>
+    <input type="hidden" id="review-booking-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="form-group"><label class="form-label">Cleanliness</label><input type="number" class="form-input" id="rv-cleanliness" min="1" max="5" value="5"></div>
+      <div class="form-group"><label class="form-label">Communication</label><input type="number" class="form-input" id="rv-communication" min="1" max="5" value="5"></div>
+      <div class="form-group"><label class="form-label">Check-in</label><input type="number" class="form-input" id="rv-checkin" min="1" max="5" value="5"></div>
+      <div class="form-group"><label class="form-label">Location</label><input type="number" class="form-input" id="rv-location" min="1" max="5" value="5"></div>
+      <div class="form-group"><label class="form-label">Value</label><input type="number" class="form-input" id="rv-value" min="1" max="5" value="5"></div>
+      <div class="form-group"><label class="form-label">Accuracy</label><input type="number" class="form-input" id="rv-accuracy" min="1" max="5" value="5"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your review</label>
+      <textarea class="form-input" id="rv-comment" rows="4" placeholder="Share your experience..."></textarea>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="Trips.submitReview()">Submit review</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<style>
+  .tab-btn { padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text-2);border-bottom:2px solid transparent;transition:all .15s; }
+  .tab-btn:hover { color:var(--text); }
+  .tab-btn.active { color:var(--text);border-bottom-color:var(--text); }
+  .trip-card { display:flex;gap:20px;padding:24px 0;border-bottom:1px solid var(--border); }
+  .trip-card:last-child { border-bottom:none; }
+  .trip-img { width:180px;height:130px;border-radius:var(--radius-md);overflow:hidden;flex-shrink:0;background:#E2D5C3;display:flex;align-items:center;justify-content:center;font-size:44px; }
+  .trip-img img { width:100%;height:100%;object-fit:cover; }
+  .trip-info { flex:1; }
+  .trip-title { font-size:18px;font-weight:700;margin-bottom:4px; }
+  .trip-loc { font-size:14px;color:var(--text-2);margin-bottom:8px; }
+  .trip-dates { font-size:14px;margin-bottom:6px; }
+  .trip-price { font-size:15px;font-weight:700;margin-bottom:12px; }
+  .trip-ref { font-size:12px;color:var(--text-3);font-family:monospace; }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/websocket.js"></script>
+<script>
+
+  /* Resolve frontend root dynamically */
+  function _rootPath() {
+    const path = window.location.pathname;
+    const marker = '/frontend/';
+    const idx = path.indexOf(marker);
+    if (idx !== -1) return path.substring(0, idx + marker.length);
+    return path.replace(/\/[^/]*$/, '/');
+  }
+
+  const Trips = {
+    all: [],
+
+    async init() {
+      if (!Auth.require()) return;
+
+      // Nav logo
+      document.getElementById('nav-logo').addEventListener('click', () => {
+        window.location.href = _rootPath() + 'index.html';
+      });
+
+      // Explore button
+      document.getElementById('btn-explore').addEventListener('click', () => {
+        window.location.href = _rootPath() + 'index.html';
+      });
+
+      // Render dropdown
+      Auth.renderNavUser();
+
+      await this.load();
+      WS.connect();
+    },
+
+    async load() {
+      const list = document.getElementById('trips-list');
+      list.innerHTML = '<p class="text-muted">Loading your trips...</p>';
+      try {
+        const data = await API.getMyBookings(0);
+        this.all = data.content || [];
+        this.render(this.all);
+      } catch (e) {
+        list.innerHTML = `<p class="text-muted">Failed to load trips: ${e.message}</p>`;
+      }
+    },
+
+    filter(status, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filtered = status === 'all' ? this.all
+              : this.all.filter(b => b.status === status ||
+                      (status === 'CANCELLED' && (b.status === 'CANCELLED' || b.status === 'REJECTED')));
+      this.render(filtered);
+    },
+
+    render(bookings) {
+      const list = document.getElementById('trips-list');
+      if (!bookings.length) {
+        list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">🧳</div>
+          <h3>No trips found</h3>
+          <p>When you book a stay, it will appear here.</p>
+          <button class="btn btn-primary" id="btn-start-exploring">Start exploring</button>
+        </div>`;
+        document.getElementById('btn-start-exploring')?.addEventListener('click', () => {
+          window.location.href = _rootPath() + 'index.html';
+        });
+        return;
+      }
+      list.innerHTML = bookings.map(b => `
+      <div class="trip-card">
+        <div class="trip-img">
+          ${b.property?.primaryImage ? `<img src="${b.property.primaryImage}" alt="">` : '🏠'}
+        </div>
+        <div class="trip-info">
+          <div class="trip-title">${b.property?.title || 'Property'}</div>
+          <div class="trip-loc">${b.property?.city || ''}</div>
+          <div class="trip-dates">${Utils.formatDate(b.checkIn)} → ${Utils.formatDate(b.checkOut)} · ${b.nights} night${b.nights > 1 ? 's' : ''} · ${b.guests} guest${b.guests > 1 ? 's' : ''}</div>
+          <div class="trip-price">${Utils.formatCurrency(b.totalAmount)}</div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="badge ${b.status === 'CONFIRMED' ? 'badge-success' : b.status === 'PENDING' ? 'badge-warning' : b.status === 'COMPLETED' ? 'badge-gray' : 'badge-danger'}">${b.status}</span>
+            ${b.status === 'CONFIRMED' || b.status === 'PENDING' ? `<button class="btn btn-secondary btn-sm" onclick="Trips.cancel(${b.id})">Cancel</button>` : ''}
+            ${b.canReview ? `<button class="btn btn-outline btn-sm" onclick="Trips.openReview(${b.id})">Write review</button>` : ''}
+          </div>
+          <div class="trip-ref mt-8">Ref: ${b.referenceId}</div>
+        </div>
+      </div>`).join('');
+    },
+
+    async cancel(id) {
+      if (!confirm('Cancel this booking?')) return;
+      try {
+        await API.cancelBooking(id);
+        Utils.toast('Booking cancelled');
+        await this.load();
+      } catch (e) { Utils.toast('Error: ' + e.message); }
+    },
+
+    openReview(bookingId) {
+      document.getElementById('review-booking-id').value = bookingId;
+      Utils.showModal('review-modal');
+    },
+
+    async submitReview() {
+      try {
+        await API.createReview({
+          bookingId:     parseInt(document.getElementById('review-booking-id').value),
+          cleanliness:   parseInt(document.getElementById('rv-cleanliness').value),
+          communication: parseInt(document.getElementById('rv-communication').value),
+          checkin:       parseInt(document.getElementById('rv-checkin').value),
+          location:      parseInt(document.getElementById('rv-location').value),
+          value:         parseInt(document.getElementById('rv-value').value),
+          accuracy:      parseInt(document.getElementById('rv-accuracy').value),
+          comment:       document.getElementById('rv-comment').value,
+        });
+        Utils.hideModal('review-modal');
+        Utils.toast('Review submitted! ⭐');
+        await this.load();
+      } catch (e) { Utils.toast('Error: ' + e.message); }
+    },
+  };
+
+  document.addEventListener('DOMContentLoaded', () => Trips.init());
+</script>
+</body>
+</html>

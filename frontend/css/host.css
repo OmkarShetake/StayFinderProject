@@ -1,0 +1,136 @@
+/* ── Host Dashboard ──────────────────────────────────────────────── */
+.host-layout {
+  display: flex;
+  min-height: calc(100vh - 80px);
+}
+
+.host-sidebar {
+  width: 240px;
+  border-right: 1px solid var(--border);
+  padding: 24px 0;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+  height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all var(--transition);
+  border-left: 3px solid transparent;
+}
+.sidebar-nav-item:hover  { color: var(--text); background: var(--bg); }
+.sidebar-nav-item.active { color: var(--text); border-left-color: var(--text); background: var(--bg); }
+.sidebar-nav-icon { font-size: 18px; width: 24px; text-align: center; }
+
+.host-main { flex: 1; padding: 32px 40px; }
+
+.host-welcome   { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+.host-welcome-sub { font-size: 16px; color: var(--text-2); margin-bottom: 28px; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.stat-card-lbl { font-size: 13px; color: var(--text-2); font-weight: 600; margin-bottom: 8px; }
+.stat-card-val { font-size: 28px; font-weight: 700; }
+.stat-card-val.green { color: var(--green); }
+.stat-card-val.red   { color: var(--red); }
+
+.host-section { margin-bottom: 32px; }
+.host-section-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.host-section-hdr h3 { font-size: 20px; font-weight: 700; }
+
+/* Booking list */
+.booking-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.booking-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition);
+}
+.booking-row:hover { background: var(--bg); }
+.booking-row:last-child { border-bottom: none; }
+.booking-row-img {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.booking-row-img img { width: 100%; height: 100%; object-fit: cover; }
+.booking-row-meta  { flex: 1; min-width: 0; }
+.booking-row-guest { font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.booking-row-prop  { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+.booking-row-dates { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.booking-row-price { font-size: 14px; font-weight: 600; flex-shrink: 0; }
+.booking-row-btns  { display: flex; gap: 8px; flex-shrink: 0; }
+.booking-row-btn {
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.booking-row-btn.approve { background: var(--text); color: var(--white); border: 1px solid var(--text); }
+.booking-row-btn.approve:hover { background: #111; }
+.booking-row-btn.decline { background: var(--white); color: var(--text); border: 1px solid var(--border); }
+.booking-row-btn.decline:hover { background: var(--bg); }
+
+/* Listing grid */
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.listing-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow var(--transition);
+}
+.listing-card:hover { box-shadow: var(--shadow-lg); }
+.listing-card-img {
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  overflow: hidden;
+}
+.listing-card-img img { width: 100%; height: 100%; object-fit: cover; }
+.listing-card-body { padding: 16px; }
+.listing-card-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.listing-card-meta { font-size: 13px; color: var(--text-2); margin-bottom: 10px; }
+.listing-card-tags { display: flex; gap: 6px; flex-wrap: wrap; }

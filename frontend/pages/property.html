@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Property — StayFinder</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/nav.css">
+  <link rel="stylesheet" href="../css/property.css">
+  <link rel="stylesheet" href="../css/auth.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-logo" id="nav-logo">stayfinder</div>
+  <div class="nav-right">
+    <button class="nav-link hidden" id="nav-login-btn">Log in</button>
+    <div class="nav-user" style="position:relative">
+      <div class="nav-ham">☰</div>
+      <div class="nav-avatar" id="nav-avatar">👤</div>
+      <div class="notif-dot hidden"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- Detail Page -->
+<div class="detail-page">
+
+  <!-- Header -->
+  <div class="detail-header">
+    <div>
+      <h1 class="detail-title" id="detail-title">Loading...</h1>
+      <div class="detail-meta">
+        <span id="detail-rating"></span>
+        <span class="detail-meta-sep" id="sep1" style="display:none">·</span>
+        <span class="detail-meta-sh hidden" id="detail-superhost">Superhost</span>
+        <span class="detail-meta-sep">·</span>
+        <span class="detail-meta-link" id="detail-location"></span>
+      </div>
+    </div>
+    <div class="detail-actions">
+      <button class="detail-action-btn" id="share-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        Share
+      </button>
+      <button class="detail-action-btn" id="save-btn">♡ Save</button>
+    </div>
+  </div>
+
+  <!-- Photo grid -->
+  <div class="photo-grid">
+    <div class="photo-main" id="photo-main" style="background:#E2D5C3;font-size:80px">🏠
+      <button class="show-all-btn">Show all photos</button>
+    </div>
+    <div class="photo-thumb" id="photo-thumb-1" style="background:#D5E2C3;font-size:44px">🛏</div>
+    <div class="photo-thumb" id="photo-thumb-2" style="background:#C3D5E2;font-size:44px">🚿</div>
+  </div>
+
+  <!-- Detail body -->
+  <div class="detail-body">
+
+    <!-- Left column -->
+    <div class="detail-left">
+
+      <!-- Host row -->
+      <div class="detail-host-row">
+        <div>
+          <h3 class="detail-host-title" id="host-title">Loading...</h3>
+          <div class="detail-host-sub" id="host-sub"></div>
+        </div>
+        <div class="host-avatar-wrap">
+          <div class="host-avatar" id="host-avatar"></div>
+          <div class="host-superhost-badge hidden" id="host-superhost-badge">★</div>
+        </div>
+      </div>
+
+      <!-- Highlights -->
+      <div class="highlights">
+        <div class="highlight hidden" id="highlight-superhost">
+          <div class="highlight-icon">🏅</div>
+          <div>
+            <div class="highlight-title" id="superhost-title">This host is a Superhost</div>
+            <div class="highlight-sub">Superhosts are experienced, highly rated hosts committed to great stays.</div>
+          </div>
+        </div>
+        <div class="highlight">
+          <div class="highlight-icon">📍</div>
+          <div>
+            <div class="highlight-title">Great location</div>
+            <div class="highlight-sub">95% of recent guests gave the location a 5-star rating.</div>
+          </div>
+        </div>
+        <div class="highlight hidden" id="highlight-instant">
+          <div class="highlight-icon">⚡</div>
+          <div>
+            <div class="highlight-title">Instant book</div>
+            <div class="highlight-sub">Book without waiting for host approval.</div>
+          </div>
+        </div>
+        <div class="highlight">
+          <div class="highlight-icon">🗓</div>
+          <div>
+            <div class="highlight-title">Free cancellation for 48 hours</div>
+            <div class="highlight-sub">Get a full refund if you change your mind within 48 hours of booking.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amenities -->
+      <div class="amenity-section">
+        <h4>What this place offers</h4>
+        <div class="amenity-grid" id="amenity-grid"></div>
+      </div>
+
+      <!-- Rating -->
+      <div class="rating-section">
+        <div class="rating-hdr" id="rating-hdr">Reviews</div>
+        <div class="rating-grid">
+          <div class="rating-row"><span>Cleanliness</span><div class="rating-bar"><div class="rating-fill" id="bar-cleanliness" style="width:0%"></div></div><span id="lbl-cleanliness"></span></div>
+          <div class="rating-row"><span>Communication</span><div class="rating-bar"><div class="rating-fill" id="bar-communication" style="width:0%"></div></div><span id="lbl-communication"></span></div>
+          <div class="rating-row"><span>Check-in</span><div class="rating-bar"><div class="rating-fill" id="bar-checkin" style="width:0%"></div></div><span id="lbl-checkin"></span></div>
+          <div class="rating-row"><span>Location</span><div class="rating-bar"><div class="rating-fill" id="bar-location" style="width:0%"></div></div><span id="lbl-location"></span></div>
+          <div class="rating-row"><span>Value</span><div class="rating-bar"><div class="rating-fill" id="bar-value" style="width:0%"></div></div><span id="lbl-value"></span></div>
+          <div class="rating-row"><span>Accuracy</span><div class="rating-bar"><div class="rating-fill" id="bar-accuracy" style="width:0%"></div></div><span id="lbl-accuracy"></span></div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="reviews-section">
+        <h4 style="font-size:18px;font-weight:700;margin-bottom:20px">Guest reviews</h4>
+        <div id="reviews-container"><p class="text-muted">Loading reviews...</p></div>
+      </div>
+
+    </div><!-- /detail-left -->
+
+    <!-- Booking card -->
+    <div>
+      <div class="booking-card">
+        <div class="booking-card-price-row">
+          <div class="booking-price-big" id="bk-price">₹— <span>night</span></div>
+          <div class="booking-card-rating" id="bk-rating"></div>
+        </div>
+
+        <!-- Date range -->
+        <div class="date-range-box">
+          <div class="date-range-row">
+            <div class="date-cell">
+              <div class="date-cell-lbl">Check-in</div>
+              <div class="date-cell-val" id="ci-val">Add date</div>
+            </div>
+            <div class="date-cell">
+              <div class="date-cell-lbl">Checkout</div>
+              <div class="date-cell-val" id="co-val">Add date</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="cal">
+          <div class="cal-hdr">
+            <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
+            <div class="cal-month-title" id="cal-month-title"></div>
+            <button class="cal-nav-btn" id="cal-next">&#8250;</button>
+          </div>
+          <div class="cal-days-hdr" id="cal-days-hdr"></div>
+          <div class="cal-days" id="cal-days"></div>
+        </div>
+
+        <!-- Guests -->
+        <div class="guests-box">
+          <div>
+            <div class="guests-box-lbl">Guests</div>
+            <div class="guests-box-val" id="guest-val">1 guest</div>
+          </div>
+          <div class="guest-ctrl">
+            <button class="guest-ctrl-btn" id="btn-guest-minus" disabled>−</button>
+            <span class="guest-ctrl-count" id="guest-count">1</span>
+            <button class="guest-ctrl-btn" id="btn-guest-plus">+</button>
+          </div>
+        </div>
+
+        <button class="reserve-btn" id="reserve-btn">Reserve</button>
+        <div class="reserve-note">You won't be charged yet</div>
+
+        <!-- Price breakdown -->
+        <div class="price-breakdown hidden" id="price-breakdown">
+          <div class="price-row"><span class="underline" id="pb-label">—</span><span id="pb-base">—</span></div>
+          <div class="price-row"><span>Cleaning fee</span><span id="pb-cleaning">—</span></div>
+          <div class="price-row"><span>StayFinder service fee</span><span id="pb-service">—</span></div>
+          <div class="price-total"><span>Total before taxes</span><span id="pb-total">—</span></div>
+        </div>
+        <div id="pb-placeholder" style="text-align:center;font-size:13px;color:#717171;padding:16px 0">
+          Select dates to see the full price
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /detail-body -->
+</div><!-- /detail-page -->
+
+<!-- Auth Modal -->
+<div class="modal-overlay hidden" id="auth-modal">
+  <div class="modal auth-modal">
+    <button class="modal-close" onclick="Utils.hideModal('auth-modal')">✕</button>
+    <h3 id="auth-modal-title" style="text-align:center;margin-bottom:20px">Log in to StayFinder</h3>
+    <div class="auth-modal-tabs">
+      <div class="auth-modal-tab active" id="auth-tab-login">Log in</div>
+      <div class="auth-modal-tab" id="auth-tab-register">Sign up</div>
+    </div>
+    <form id="login-form" class="hidden">
+      <div class="auth-error hidden" id="login-error"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="login-email" required></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="login-password" required></div>
+      <button type="submit" class="btn btn-primary btn-full" id="login-submit">Log in</button>
+    </form>
+    <form id="register-form" class="hidden">
+      <div class="auth-error hidden" id="reg-error"></div>
+      <div class="form-group"><label class="form-label">Full name</label><input type="text" class="form-input" id="reg-name" required></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" id="reg-email" required></div>
+      <div class="form-group"><label class="form-label">Phone</label><input type="tel" class="form-input" id="reg-phone"></div>
+      <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-input" id="reg-password" required></div>
+      <button type="submit" class="btn btn-primary btn-full" id="register-submit">Sign up</button>
+    </form>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/websocket.js"></script>
+<script src="../js/property.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Fix nav logo — use dynamic root path same as auth.js
+    document.getElementById('nav-logo').addEventListener('click', () => {
+      const path = window.location.pathname;
+      const marker = '/frontend/';
+      const idx = path.indexOf(marker);
+      const root = idx !== -1
+              ? path.substring(0, idx + marker.length)
+              : path.replace(/\/[^/]*$/, '/');
+      window.location.href = root + 'index.html';
+    });
+
+    // Share button — use Web Share API with clipboard fallback
+    document.getElementById('share-btn').addEventListener('click', async () => {
+      const title = document.getElementById('detail-title')?.textContent || 'StayFinder Property';
+      const url   = window.location.href;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, url });
+        } catch (e) {
+          // User cancelled share — do nothing
+        }
+      } else {
+        // Fallback: copy link to clipboard
+        try {
+          await navigator.clipboard.writeText(url);
+          Utils.toast('Link copied to clipboard! 🔗');
+        } catch {
+          Utils.toast('Copy this link: ' + url);
+        }
+      }
+    });
+
+    // Show login form by default in auth modal
+    document.getElementById('login-form').classList.remove('hidden');
+  });
+</script>
+</body>
+</html>

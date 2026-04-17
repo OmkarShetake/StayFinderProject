@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishlist — StayFinder</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/nav.css">
+  <link rel="stylesheet" href="../css/search.css">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo" onclick="window.location.href='/'">stayfinder</div>
+  <div class="nav-right">
+    <button class="nav-link" onclick="window.location.href='/'">Explore</button>
+    <div class="nav-user">
+      <div class="nav-ham">☰</div>
+      <div class="nav-avatar" id="nav-avatar"></div>
+    </div>
+    <button class="nav-link" onclick="Auth.logout()">Log out</button>
+  </div>
+</nav>
+
+<div style="max-width:1200px;margin:0 auto;padding:40px 40px 60px">
+  <h1 style="margin-bottom:8px">Wishlist</h1>
+  <p class="text-muted" style="margin-bottom:32px">Properties you've saved</p>
+  <div class="prop-grid" id="wishlist-grid" style="padding:0"></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="../js/utils.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if (!Auth.require()) return;
+  const user = Auth.getUser();
+  if (user) document.getElementById('nav-avatar').textContent = Utils.initials(user.fullName);
+
+  const grid = document.getElementById('wishlist-grid');
+  grid.innerHTML = Utils.skeletonCards(4);
+
+  try {
+    const props = await API.getWishlist();
+    if (!props.length) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-state-icon">♡</div>
+          <h3>Nothing saved yet</h3>
+          <p>Tap the heart on any property to save it to your wishlist.</p>
+          <button class="btn btn-primary" onclick="window.location.href='/'">Explore properties</button>
+        </div>`;
+      return;
+    }
+    grid.innerHTML = props.map(p => `
+      <div class="prop-card" onclick="window.location.href='property.html?id=${p.id}'">
+        <div class="prop-card-img">
+          ${p.images?.[0]
+            ? `<img class="prop-card-img-inner" src="${p.images[0]}" alt="${p.title}" loading="lazy">`
+            : `<div class="prop-card-img-placeholder" style="background:#E2D5C3;font-size:52px">🏠</div>`}
+          <div class="prop-heart" onclick="event.stopPropagation();removeWishlist(${p.id},this)">❤️</div>
+        </div>
+        <div class="prop-card-info">
+          <div class="prop-card-row1">
+            <div class="prop-card-loc">${p.city}, ${p.state}</div>
+            ${p.avgRating > 0 ? `<div class="prop-card-rating">★ ${Number(p.avgRating).toFixed(2)}</div>` : ''}
+          </div>
+          <div class="prop-card-type">${Utils.propertyTypeLabel(p.propertyType)} · ${p.beds} bed${p.beds > 1 ? 's' : ''}</div>
+          <div class="prop-card-price"><strong>${Utils.formatCurrency(p.pricePerNight)}</strong> night</div>
+        </div>
+      </div>`).join('');
+  } catch (e) {
+    grid.innerHTML = `<p class="text-muted" style="grid-column:1/-1">Failed to load wishlist</p>`;
+  }
+});
+
+async function removeWishlist(id, el) {
+  try {
+    await API.toggleWishlist(id);
+    el.textContent = '🤍';
+    Utils.toast('Removed from wishlist');
+    el.closest('.prop-card').style.opacity = '.4';
+    setTimeout(() => el.closest('.prop-card').remove(), 400);
+  } catch {}
+}
+</script>
+</body>
+</html>

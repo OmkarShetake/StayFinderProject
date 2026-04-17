@@ -1,0 +1,153 @@
+/* ── Property Grid ───────────────────────────────────────────────── */
+.prop-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  padding: 24px 40px 60px;
+}
+
+@media (max-width: 1200px) { .prop-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 900px)  { .prop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px)  { .prop-grid { grid-template-columns: 1fr; padding: 16px; } }
+
+/* ── Property Card ───────────────────────────────────────────────── */
+.prop-card { cursor: pointer; }
+.prop-card:hover .prop-card-img-inner { transform: scale(1.04); }
+
+.prop-card-img {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: #f0ece4;
+}
+.prop-card-img-inner {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .35s cubic-bezier(.25,.46,.45,.94);
+}
+.prop-card-img-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 52px;
+  transition: transform .35s cubic-bezier(.25,.46,.45,.94);
+}
+
+.prop-heart {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 22px;
+  cursor: pointer;
+  transition: transform .2s;
+  z-index: 2;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.35));
+  line-height: 1;
+}
+.prop-heart:hover { transform: scale(1.15); }
+
+.prop-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: var(--white);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,.12);
+}
+
+.prop-card-info { padding: 10px 0 0; }
+
+.prop-card-row1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+}
+.prop-card-loc {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+.prop-card-rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 13px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+.prop-card-type  { font-size: 13px; color: var(--text-2); margin-top: 2px; }
+.prop-card-dates { font-size: 13px; color: var(--text-2); margin-top: 1px; }
+.prop-card-price { font-size: 14px; margin-top: 6px; }
+.prop-card-price strong { font-weight: 700; font-size: 14px; }
+
+/* ── Skeleton Cards ──────────────────────────────────────────────── */
+.prop-card-skeleton .prop-card-img {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-line {
+  height: 14px;
+  margin-top: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ── Search filter bar ───────────────────────────────────────────── */
+.search-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 40px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.search-filters::-webkit-scrollbar { display: none; }
+
+.filter-pill {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--white);
+  color: var(--text);
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.filter-pill:hover  { border-color: var(--text); }
+.filter-pill.active { background: var(--text); color: var(--white); border-color: var(--text); }
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--white);
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.filter-btn:hover { border-color: var(--text); }

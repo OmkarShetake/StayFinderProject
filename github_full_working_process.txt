@@ -1,0 +1,176 @@
+GITHUB PROJECT UPLOAD AND UPDATE PROCESS (FULL WORKING GUIDE)
+
+Project Example: StayFinder
+
+  --------------------------------------
+  PART 1 — FIRST TIME UPLOAD TO GITHUB
+  --------------------------------------
+
+Step 1 — Create Repository on GitHub 
+1. Open https://github.com
+2.Click “New Repository” 
+3. Enter repository name (example: stayfinder) 
+4.Select Public
+5. Click “Create Repository” 
+6. Copy repository URL
+
+Example: https://github.com/your-username/stayfinder.git
+
+------------------------------------------------------------------------
+
+Step 2 — Open Project Folder in Terminal
+
+Open terminal inside your project folder:
+
+cd stayfinder
+
+------------------------------------------------------------------------
+
+Step 3 — Initialize Git
+
+git init
+
+------------------------------------------------------------------------
+
+Step 4 — Add Files
+
+git add .
+
+------------------------------------------------------------------------
+
+Step 5 — Commit Files
+
+git commit -m “Initial commit - StayFinder Project”
+
+------------------------------------------------------------------------
+
+Step 6 — Connect GitHub Repository
+
+git remote add origin https://github.com/your-username/stayfinder.git
+
+------------------------------------------------------------------------
+
+Step 7 — Push Project to GitHub
+
+git branch -M main git push -u origin main
+
+Your project is now uploaded to GitHub.
+
+  ----------------------------------------
+  PART 2 — AFTER CHANGING OR ADDING CODE
+  ----------------------------------------
+
+Whenever you:
+
+-   Add new files
+-   Modify existing files
+-   Delete files
+-   Fix bugs
+-   Add new features
+
+Use these commands.
+
+Step 1 — Add Changes
+
+git add .
+
+------------------------------------------------------------------------
+
+Step 2 — Commit Changes
+
+git commit -m “Describe what you changed”
+
+Examples:
+
+git commit -m “Added payment module” git commit -m “Fixed login bug” git
+commit -m “Updated UI design”
+
+------------------------------------------------------------------------
+
+Step 3 — Push Changes
+
+git push
+
+Your updated code will appear on GitHub.
+
+  -------------------------------------
+  PART 3 — CHECK STATUS (VERY USEFUL)
+  -------------------------------------
+
+To see changed files:
+
+git status
+
+Shows:
+
+-   Modified files
+-   New files
+-   Deleted files
+
+  --------------------------
+  PART 4 — ADD README FILE
+  --------------------------
+
+Create:
+
+README.md
+
+Then run:
+
+git add README.md 
+git commit -m “Added README file” 
+git push
+
+  ------------------------------
+  PART 5 — ADD .gitignore FILE
+  ------------------------------
+
+Create:
+
+.gitignore
+
+Add:
+
+target/ .log .class node_modules/ .idea/ .vscode/
+
+Then run:
+
+git add .gitignore git commit -m “Added gitignore” git push
+
+  ------------------------------------------
+  PART 6 — DAILY WORKFLOW (MOST IMPORTANT)
+  ------------------------------------------
+
+Every time you change project:
+
+git add . 
+git commit -m “your message” 
+git push
+
+Repeat this process every time you update project.
+
+  ----------------------------------
+  PART 7 — COMMON ERRORS AND FIXES
+  ----------------------------------
+
+Error: git not recognized
+
+Solution: Install Git from: https://git-scm.com
+
+------------------------------------------------------------------------
+
+Error: permission denied
+
+Solution: Login to GitHub again or use GitHub token.
+
+------------------------------------------------------------------------
+
+Error: push rejected
+
+Solution: Run:
+
+git pull origin main git push
+
+  --------------
+  END OF GUIDE
+  --------------

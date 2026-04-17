@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StayFinder — Find your perfect stay</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/nav.css">
+  <link rel="stylesheet" href="css/search.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+
+<!-- ── Navbar ─────────────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="nav-logo" id="nav-logo">stayfinder</div>
+
+  <div class="nav-search" id="nav-search-bar">
+    <div class="ns-pill">
+      <div class="ns-label">Where</div>
+      <div class="ns-value" id="ns-city">Anywhere</div>
+    </div>
+    <div class="ns-pill">
+      <div class="ns-label">Check in</div>
+      <div class="ns-value" id="ns-checkin">Add dates</div>
+    </div>
+    <div class="ns-pill">
+      <div class="ns-label">Check out</div>
+      <div class="ns-value" id="ns-checkout">Add dates</div>
+    </div>
+    <div class="ns-pill">
+      <div class="ns-label">Who</div>
+      <div class="ns-value" id="ns-guests">Add guests</div>
+    </div>
+    <button class="ns-btn" onclick="Utils.showModal('search-modal')">
+      <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4"/><line x1="9.5" y1="9.5" x2="12.5" y2="12.5"/></svg>
+    </button>
+  </div>
+
+  <div class="nav-right">
+    <button class="nav-link" id="nav-host-btn">Airbnb your home</button>
+    <button class="nav-link hidden" id="nav-login-btn">Log in</button>
+
+    <!-- User menu trigger -->
+    <div class="nav-user" id="nav-user-btn" style="position:relative">
+      <div class="nav-ham">☰</div>
+      <div class="nav-avatar" id="nav-avatar">👤</div>
+      <div class="notif-dot hidden"></div>
+
+      <!-- Dropdown menu -->
+      <div class="nav-dropdown" id="nav-dropdown">
+
+        <!-- Logged-in user header -->
+        <div class="nav-dropdown-user hidden" id="nav-dropdown-user">
+          <div class="nav-dropdown-avatar" id="nav-dropdown-avatar"></div>
+          <div>
+            <div class="nav-dropdown-name" id="nav-dropdown-name"></div>
+            <div class="nav-dropdown-email" id="nav-dropdown-email"></div>
+          </div>
+        </div>
+
+        <!-- Guest links -->
+        <div class="nav-dropdown-section" id="nav-dropdown-guest">
+          <button class="nav-dropdown-item" id="nav-dropdown-login">
+            <span class="nav-dropdown-item-icon">🔑</span> Log in
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-signup">
+            <span class="nav-dropdown-item-icon">✨</span> Sign up
+          </button>
+        </div>
+
+        <!-- Logged-in links -->
+        <div class="nav-dropdown-section hidden" id="nav-dropdown-auth">
+          <button class="nav-dropdown-item" id="nav-dropdown-notifications">
+            <span class="nav-dropdown-item-icon">🔔</span>
+            <span>Notifications</span>
+            <span class="nav-dropdown-notif-badge hidden" id="nav-notif-badge"></span>
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-trips">
+            <span class="nav-dropdown-item-icon">🧳</span> My trips
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-wishlist">
+            <span class="nav-dropdown-item-icon">❤️</span> Wishlists
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-host-link">
+            <span class="nav-dropdown-item-icon">🏠</span> Host dashboard
+          </button>
+        </div>
+
+        <!-- Logout -->
+        <div class="hidden" id="nav-dropdown-logout-wrap">
+          <button class="nav-dropdown-logout" id="nav-logout">
+            <span class="nav-dropdown-logout-icon">👋</span> Log out
+          </button>
+        </div>
+
+        <!-- Notification sub-panel (inside dropdown, shown on click) -->
+        <div class="nav-notif-panel hidden" id="nav-notif-panel">
+          <div class="nav-notif-panel-hdr">
+            <button class="nav-notif-back" id="nav-notif-back">← Back</button>
+            <span>Notifications</span>
+            <button class="nav-notif-mark" id="nav-notif-mark-read">Mark all read</button>
+          </div>
+          <div id="notif-list"><div style="padding:20px;text-align:center;color:#717171;font-size:13px">Loading...</div></div>
+        </div>
+
+      </div><!-- /nav-dropdown -->
+    </div>
+  </div>
+</nav>
+
+<!-- ── Category bar ────────────────────────────────────────────────── -->
+<div class="cat-bar">
+  <div class="cat-item active" data-category="">
+    <div class="cat-icon">🏠</div><div class="cat-label">All homes</div>
+  </div>
+  <div class="cat-item" data-category="BEACH">
+    <div class="cat-icon">🏖</div><div class="cat-label">Beach</div>
+  </div>
+  <div class="cat-item" data-category="MOUNTAIN">
+    <div class="cat-icon">🏔</div><div class="cat-label">Mountain</div>
+  </div>
+  <div class="cat-item" data-category="CITY">
+    <div class="cat-icon">🏙</div><div class="cat-label">City</div>
+  </div>
+  <div class="cat-item" data-category="COUNTRYSIDE">
+    <div class="cat-icon">🌿</div><div class="cat-label">Countryside</div>
+  </div>
+  <div class="cat-item" data-category="LAKEFRONT">
+    <div class="cat-icon">🌊</div><div class="cat-label">Lakefront</div>
+  </div>
+  <div class="cat-item" data-category="UNIQUE">
+    <div class="cat-icon">🛖</div><div class="cat-label">Unique</div>
+  </div>
+  <div class="cat-item" data-category="HERITAGE">
+    <div class="cat-icon">🏰</div><div class="cat-label">Heritage</div>
+  </div>
+  <div class="cat-item" data-category="CAMPING">
+    <div class="cat-icon">🏕</div><div class="cat-label">Camping</div>
+  </div>
+</div>
+
+<!-- ── Property grid ───────────────────────────────────────────────── -->
+<div class="prop-grid" id="prop-grid"></div>
+
+<!-- ── Load more ───────────────────────────────────────────────────── -->
+<div style="text-align:center;padding:0 0 48px">
+  <button class="btn btn-outline hidden" id="load-more-btn">Show more</button>
+</div>
+
+<!-- ── Search Modal ────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="search-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="Utils.hideModal('search-modal')">✕</button>
+    <h3 style="margin-bottom:20px">Search properties</h3>
+    <div class="form-group">
+      <label class="form-label">Where</label>
+      <input type="text" class="form-input" id="sm-city" placeholder="Mumbai, Goa, Manali...">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Check in</label>
+        <input type="date" class="form-input" id="sm-checkin">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Check out</label>
+        <input type="date" class="form-input" id="sm-checkout">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Guests</label>
+      <input type="number" class="form-input" id="sm-guests" min="1" max="16" placeholder="1">
+    </div>
+    <button class="btn btn-primary btn-full" id="search-modal-btn">Search</button>
+  </div>
+</div>
+
+<!-- ── Auth Modal ──────────────────────────────────────────────────── -->
+<div class="modal-overlay hidden" id="auth-modal">
+  <div class="modal auth-modal">
+    <button class="modal-close" onclick="Utils.hideModal('auth-modal')">✕</button>
+    <h3 id="auth-modal-title" style="text-align:center;margin-bottom:20px">Log in to StayFinder</h3>
+
+    <div class="auth-modal-tabs">
+      <div class="auth-modal-tab active" id="auth-tab-login">Log in</div>
+      <div class="auth-modal-tab" id="auth-tab-register">Sign up</div>
+    </div>
+
+    <!-- Login form -->
+    <form id="login-form" class="hidden">
+      <div class="auth-error hidden" id="login-error"></div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="login-email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="login-password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="login-submit">Log in</button>
+      <p style="font-size:12px;color:#717171;text-align:center;margin-top:12px">
+        Demo: guest@stayfinder.com / Admin@123
+      </p>
+    </form>
+
+    <!-- Register form -->
+    <form id="register-form" class="hidden">
+      <div class="auth-error hidden" id="reg-error"></div>
+      <div class="form-group">
+        <label class="form-label">Full name</label>
+        <input type="text" class="form-input" id="reg-name" placeholder="Your name" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="reg-email" placeholder="you@example.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input type="tel" class="form-input" id="reg-phone" placeholder="+91 98765 43210">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="reg-password" placeholder="Min 8 characters" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="register-submit">Sign up</button>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/websocket.js"></script>
+<script src="js/search.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Fix nav logo path
+    document.getElementById('nav-logo')?.addEventListener('click', () => {
+      const path = window.location.pathname;
+      const marker = '/frontend/';
+      const idx = path.indexOf(marker);
+      const root = idx !== -1 ? path.substring(0, idx + marker.length) : path.replace(/\/[^/]*$/, '/');
+      window.location.href = root + 'index.html';
+    });
+
+    // Show login form by default
+    document.getElementById('login-form')?.classList.remove('hidden');
+
+    // Auto-open login modal if ?login=1
+    if (new URLSearchParams(window.location.search).get('login') === '1') {
+      Auth.showAuthModal('login');
+    }
+
+    // Notifications sub-panel inside dropdown
+    document.getElementById('nav-dropdown-notifications')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('nav-notif-panel')?.classList.remove('hidden');
+      loadNotifList();
+    });
+
+    document.getElementById('nav-notif-back')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('nav-notif-panel')?.classList.add('hidden');
+    });
+
+    document.getElementById('nav-notif-mark-read')?.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        await API.markAllRead();
+        document.querySelector('.notif-dot')?.classList.add('hidden');
+        document.getElementById('nav-notif-badge')?.classList.add('hidden');
+        Utils.toast('All notifications marked as read');
+      } catch {}
+    });
+
+    async function loadNotifList() {
+      const list = document.getElementById('notif-list');
+      if (!list) return;
+      list.innerHTML = '<div style="padding:16px;text-align:center;color:#717171;font-size:13px">Loading...</div>';
+      try {
+        const notifs = await API.getNotifications();
+        if (!notifs.length) {
+          list.innerHTML = '<div style="padding:20px;text-align:center;color:#717171;font-size:13px">No notifications</div>';
+          return;
+        }
+        list.innerHTML = notifs.slice(0, 8).map(n => `
+          <div class="notif-item${!n.read ? ' unread' : ''}">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-msg">${n.message}</div>
+            <div class="notif-time">${Utils.relativeTime(n.createdAt)}</div>
+          </div>`).join('');
+        await API.markAllRead();
+        document.querySelector('.notif-dot')?.classList.add('hidden');
+        document.getElementById('nav-notif-badge')?.classList.add('hidden');
+      } catch {}
+    }
+  });
+</script>
+</body>
+</html>
