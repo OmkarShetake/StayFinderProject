@@ -138,4 +138,10 @@ public class PropertyController {
     public ResponseEntity<PropertyResponse> rejectProperty(@PathVariable Long id) {
         return ResponseEntity.ok(propertyService.rejectProperty(id));
     }
+
+    @DeleteMapping("/admin/properties/{id}")
+    public ResponseEntity<Map<String, String>> deleteProperty(@PathVariable Long id) {
+        propertyService.deleteProperty(id);
+        return ResponseEntity.ok(Map.of("message", "Property deleted successfully"));
+    }
 }

@@ -174,7 +174,35 @@ public class PropertyService {
                 .orElseThrow(() -> new StayFinderException("Property not found"));
         p.setStatus(PropertyStatus.REJECTED);
         propertyRepository.save(p);
+        notificationService.createAndSend(p.getHost().getId(),
+                "Your listing was rejected",
+                "'" + p.getTitle() + "' was not approved. Please review our guidelines and resubmit.",
+                "PROPERTY_REJECTED", propertyId);
         log.info("Property {} rejected", propertyId);
         return PropertyResponse.from(p);
+    }
+
+    /* ── Admin: permanently delete a property ───────────────────── */
+    @Transactional
+    public void deleteProperty(Long propertyId) {
+        Property p = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new StayFinderException("Property not found"));
+
+        // Notify host before deletion
+        notificationService.createAndSend(p.getHost().getId(),
+                "Your listing has been removed",
+                "'" + p.getTitle() + "' has been removed by an administrator.",
+                "PROPERTY_DELETED", propertyId);
+
+        // Delete availability records first (FK constraint)
+        availabilityRepository.deleteByPropertyId(propertyId);
+
+        // Delete wishlists referencing this property
+        wishlistRepository.deleteByPropertyId(propertyId);
+
+        // Delete the property (cascades to images, bookings, reviews via DB cascade)
+        propertyRepository.deleteById(propertyId);
+
+        log.info("Property {} deleted by admin", propertyId);
     }
 }

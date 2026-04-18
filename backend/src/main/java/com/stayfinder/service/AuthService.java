@@ -38,15 +38,9 @@ public class AuthService {
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
-    /*
-    ==========================================
-    CREATE DEFAULT USERS (FIXED)
-    ==========================================
-    */
-
+    /* ── Create default users on startup (runs ONCE only) ───────── */
     @PostConstruct
     public void createDefaultUsers() {
-
         createUserIfNotExists(
                 "admin@stayfinder.com",
                 "Admin@123",
@@ -55,16 +49,14 @@ public class AuthService {
                 User.Role.ADMIN,
                 false
         );
-
         createUserIfNotExists(
                 "host@stayfinder.com",
                 "Admin@123",
                 "Host User",
                 "8888888888",
-                User.Role.GUEST,   // FIXED (no HOST role)
-                true                // host flag true
+                User.Role.GUEST,
+                true
         );
-
         createUserIfNotExists(
                 "guest@stayfinder.com",
                 "Admin@123",
@@ -83,9 +75,7 @@ public class AuthService {
             User.Role role,
             boolean isHost
     ) {
-
         if (!userRepository.existsByEmail(email)) {
-
             User user = User.builder()
                     .email(email)
                     .password(passwordEncoder.encode(password))
@@ -95,26 +85,17 @@ public class AuthService {
                     .enabled(true)
                     .host(isHost)
                     .build();
-
             userRepository.save(user);
-
             log.info("Default user created: {}", email);
         }
     }
 
-    /*
-    ==========================================
-    REGISTER
-    ==========================================
-    */
-
+    /* ── Register ────────────────────────────────────────────────── */
     @Transactional
     public TokenResponse register(RegisterRequest request) {
-
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new StayFinderException("Email already registered");
         }
-
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -124,105 +105,61 @@ public class AuthService {
                 .enabled(true)
                 .host(false)
                 .build();
-
         userRepository.save(user);
-
         log.info("New user registered: {}", user.getEmail());
-
         return buildTokenResponse(user);
     }
 
-    /*
-    ==========================================
-    LOGIN
-    ==========================================
-    */
-
+    /* ── Login ───────────────────────────────────────────────────── */
     @Transactional
     public TokenResponse login(LoginRequest request) {
-
         try {
-
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(),
                             request.getPassword()
                     )
             );
-
         } catch (BadCredentialsException e) {
-
             throw new StayFinderException("Invalid email or password");
         }
-
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new StayFinderException("User not found"));
-
         log.info("User logged in: {}", user.getEmail());
-
         return buildTokenResponse(user);
     }
 
-    /*
-    ==========================================
-    REFRESH TOKEN
-    ==========================================
-    */
-
+    /* ── Refresh token ───────────────────────────────────────────── */
     @Transactional
     public TokenResponse refresh(RefreshRequest request) {
-
         RefreshToken rt = refreshTokenRepository
                 .findByToken(request.getRefreshToken())
                 .orElseThrow(() -> new StayFinderException("Invalid refresh token"));
 
         if (rt.isExpired()) {
-
             refreshTokenRepository.delete(rt);
-
-            throw new StayFinderException(
-                    "Refresh token expired. Please login again."
-            );
+            throw new StayFinderException("Refresh token expired. Please login again.");
         }
 
         User user = rt.getUser();
-
         refreshTokenRepository.delete(rt);
-
         return buildTokenResponse(user);
     }
 
-    /*
-    ==========================================
-    BECOME HOST
-    ==========================================
-    */
-
+    /* ── Become host ─────────────────────────────────────────────── */
     @Transactional
     public void becomeHost(Long userId) {
-
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new StayFinderException("User not found"));
-
         user.setHost(true);
-
         userRepository.save(user);
-
         log.info("User {} became a host", user.getEmail());
     }
 
-    /*
-    ==========================================
-    TOKEN BUILDING
-    ==========================================
-    */
-
+    /* ── Token building ──────────────────────────────────────────── */
     private TokenResponse buildTokenResponse(User user) {
-
         String accessToken = jwtUtil.generateToken(user);
-
         String refreshTokenStr = createRefreshToken(user);
-
         return new TokenResponse(
                 accessToken,
                 refreshTokenStr,
@@ -232,31 +169,14 @@ public class AuthService {
     }
 
     private String createRefreshToken(User user) {
+        // Delete any existing refresh tokens for this user (single session)
+        refreshTokenRepository.deleteByUserId(user.getId());
 
         RefreshToken rt = RefreshToken.builder()
                 .user(user)
                 .token(UUID.randomUUID().toString())
-                .expiresAt(
-                        LocalDateTime.now()
-                                .plusSeconds(refreshExpiration / 1000)
-                )
+                .expiresAt(LocalDateTime.now().plusSeconds(refreshExpiration / 1000))
                 .build();
-
         return refreshTokenRepository.save(rt).getToken();
-    }
-    @PostConstruct
-    public void resetPasswords() {
-
-        String encoded = passwordEncoder.encode("Admin@123");
-
-        System.out.println("NEW PASSWORD HASH = " + encoded);
-
-        userRepository.findAll().forEach(user -> {
-            user.setPassword(encoded);
-            user.setEnabled(true);
-            userRepository.save(user);
-        });
-
-        log.info("All user passwords reset to Admin@123");
     }
 }

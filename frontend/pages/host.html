@@ -12,15 +12,49 @@
 <body>
 
 <nav class="navbar">
-  <div class="nav-logo" onclick="window.location.href='/'">stayfinder</div>
+  <div class="nav-logo" id="nav-logo">stayfinder</div>
   <div class="nav-right">
-    <button class="nav-link" onclick="window.location.href='/'">Explore</button>
-    <div class="nav-user">
+    <button class="nav-link" id="btn-explore">Explore</button>
+    <div class="nav-user" id="nav-user-btn" style="position:relative">
       <div class="nav-ham">☰</div>
-      <div class="nav-avatar" id="nav-avatar"></div>
+      <div class="nav-avatar" id="nav-avatar">👤</div>
       <div class="notif-dot hidden"></div>
+
+      <!-- Dropdown -->
+      <div class="nav-dropdown" id="nav-dropdown">
+        <div class="nav-dropdown-user hidden" id="nav-dropdown-user">
+          <div class="nav-dropdown-avatar" id="nav-dropdown-avatar"></div>
+          <div>
+            <div class="nav-dropdown-name" id="nav-dropdown-name"></div>
+            <div class="nav-dropdown-email" id="nav-dropdown-email"></div>
+          </div>
+        </div>
+        <div class="nav-dropdown-section hidden" id="nav-dropdown-guest">
+          <button class="nav-dropdown-item" id="nav-dropdown-login">
+            <span class="nav-dropdown-item-icon">🔑</span> Log in
+          </button>
+        </div>
+        <div class="nav-dropdown-section hidden" id="nav-dropdown-auth">
+          <button class="nav-dropdown-item" id="nav-dropdown-trips">
+            <span class="nav-dropdown-item-icon">🧳</span> My trips
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-wishlist">
+            <span class="nav-dropdown-item-icon">❤️</span> Wishlists
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-host-link">
+            <span class="nav-dropdown-item-icon">🏠</span> Host dashboard
+          </button>
+          <button class="nav-dropdown-item hidden" id="nav-dropdown-admin">
+            <span class="nav-dropdown-item-icon">⚙️</span> Admin Panel
+          </button>
+        </div>
+        <div class="hidden" id="nav-dropdown-logout-wrap">
+          <button class="nav-dropdown-logout" id="nav-logout">
+            <span class="nav-dropdown-logout-icon">👋</span> Log out
+          </button>
+        </div>
+      </div>
     </div>
-    <button class="nav-link" id="nav-logout">Log out</button>
   </div>
 </nav>
 
@@ -208,11 +242,32 @@
 <script src="../js/websocket.js"></script>
 <script src="../js/host.js"></script>
 <script>
+  function _rootPath() {
+    const path = window.location.pathname;
+    const marker = '/frontend/';
+    const idx = path.indexOf(marker);
+    if (idx !== -1) return path.substring(0, idx + marker.length);
+    return path.replace(/\/[^/]*$/, '/');
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
+    // Nav logo
+    document.getElementById('nav-logo').addEventListener('click', () => {
+      window.location.href = _rootPath() + 'index.html';
+    });
+    // Explore button
+    document.getElementById('btn-explore').addEventListener('click', () => {
+      window.location.href = _rootPath() + 'index.html';
+    });
+
+    // Render full dropdown
+    Auth.renderNavUser();
+
+    // Set welcome message
     const user = Auth.getUser();
     if (user) {
-      document.getElementById('nav-avatar').textContent = Utils.initials(user.fullName);
-      document.getElementById('host-welcome').textContent = `Welcome back, ${user.fullName.split(' ')[0]} 👋`;
+      document.getElementById('host-welcome').textContent =
+              `Welcome back, ${user.fullName.split(' ')[0]} 👋`;
     }
   });
 </script>

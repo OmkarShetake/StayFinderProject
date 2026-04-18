@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard </title>
+    <title>Admin Dashboard — StayFinder</title>
     <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../css/nav.css">
     <link rel="stylesheet" href="../css/host.css">
+    <link rel="stylesheet" href="../css/auth.css">
 </head>
 <body>
 
@@ -17,10 +18,10 @@
         <button class="nav-link" id="btn-explore">Explore</button>
         <div class="nav-user" id="nav-user-btn" style="position:relative">
             <div class="nav-ham">☰</div>
-            <div class="nav-avatar" id="nav-avatar"></div>
+            <div class="nav-avatar" id="nav-avatar">👤</div>
             <div class="notif-dot hidden"></div>
 
-            <!-- Dropdown menu -->
+            <!-- Dropdown -->
             <div class="nav-dropdown" id="nav-dropdown">
                 <div class="nav-dropdown-user hidden" id="nav-dropdown-user">
                     <div class="nav-dropdown-avatar" id="nav-dropdown-avatar"></div>
@@ -29,11 +30,22 @@
                         <div class="nav-dropdown-email" id="nav-dropdown-email"></div>
                     </div>
                 </div>
+                <div class="nav-dropdown-section hidden" id="nav-dropdown-guest">
+                    <button class="nav-dropdown-item" id="nav-dropdown-login">
+                        <span class="nav-dropdown-item-icon">🔑</span> Log in
+                    </button>
+                </div>
                 <div class="nav-dropdown-section hidden" id="nav-dropdown-auth">
                     <button class="nav-dropdown-item" id="nav-dropdown-trips">
                         <span class="nav-dropdown-item-icon">🧳</span> My trips
                     </button>
-                    <button class="nav-dropdown-item" id="nav-dropdown-admin">
+                    <button class="nav-dropdown-item" id="nav-dropdown-wishlist">
+                        <span class="nav-dropdown-item-icon">❤️</span> Wishlists
+                    </button>
+                    <button class="nav-dropdown-item" id="nav-dropdown-host-link">
+                        <span class="nav-dropdown-item-icon">🏠</span> Host dashboard
+                    </button>
+                    <button class="nav-dropdown-item hidden" id="nav-dropdown-admin">
                         <span class="nav-dropdown-item-icon">⚙️</span> Admin Panel
                     </button>
                 </div>
@@ -59,7 +71,6 @@
 
     <!-- Properties Tab -->
     <div id="tab-properties">
-        <!-- Property status filter -->
         <div style="display:flex;gap:8px;margin-bottom:20px">
             <button class="btn btn-sm active" data-status="PENDING" onclick="Admin.filterProperties('PENDING',this)">Pending</button>
             <button class="btn btn-sm" data-status="APPROVED" onclick="Admin.filterProperties('APPROVED',this)">Approved</button>
@@ -77,56 +88,15 @@
 <div id="toast"></div>
 
 <style>
-    .tab-btn {
-        padding:12px 20px;
-        font-size:14px;
-        font-weight:600;
-        cursor:pointer;
-        border:none;
-        background:none;
-        color:var(--text-2);
-        border-bottom:2px solid transparent;
-        transition:all .15s;
-    }
+    .tab-btn { padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text-2);border-bottom:2px solid transparent;transition:all .15s; }
     .tab-btn:hover { color:var(--text); }
     .tab-btn.active { color:var(--text);border-bottom-color:var(--text); }
-
-    .admin-card {
-        border:1px solid var(--border);
-        border-radius:var(--radius-lg);
-        padding:20px;
-        margin-bottom:16px;
-        background:var(--white);
-    }
-    .admin-card-header {
-        display:flex;
-        justify-content:space-between;
-        align-items:flex-start;
-        margin-bottom:12px;
-    }
-    .admin-card-title {
-        font-size:16px;
-        font-weight:700;
-        margin-bottom:4px;
-    }
-    .admin-card-meta {
-        font-size:13px;
-        color:var(--text-2);
-        margin-bottom:8px;
-    }
-    .admin-card-actions {
-        display:flex;
-        gap:8px;
-        margin-top:12px;
-    }
-    .property-img {
-        width:100%;
-        height:200px;
-        border-radius:var(--radius-md);
-        object-fit:cover;
-        margin-bottom:12px;
-        background:var(--bg);
-    }
+    .admin-card { border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:16px;background:var(--white); }
+    .admin-card-header { display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px; }
+    .admin-card-title { font-size:16px;font-weight:700;margin-bottom:4px; }
+    .admin-card-meta { font-size:13px;color:var(--text-2);margin-bottom:8px; }
+    .admin-card-actions { display:flex;gap:8px;margin-top:12px;flex-wrap:wrap; }
+    .property-img { width:100%;height:200px;border-radius:var(--radius-md);object-fit:cover;margin-bottom:12px;background:var(--bg); }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
@@ -158,7 +128,6 @@
                 return;
             }
 
-            // Nav
             document.getElementById('nav-logo').addEventListener('click', () => {
                 window.location.href = _rootPath() + 'index.html';
             });
@@ -208,7 +177,7 @@
                 ${p.bedrooms} bed, ${p.bathrooms} bath
               </div>
               <div class="admin-card-meta">
-                👤 Host: ${p.host?.fullName} (${p.host?.email}) •
+                👤 Host: ${p.host?.fullName || 'N/A'} (${p.host?.email || ''}) •
                 Created: ${Utils.formatDateFull(p.createdAt)}
               </div>
             </div>
@@ -220,7 +189,8 @@
               <button class="btn btn-primary btn-sm" onclick="Admin.approveProperty(${p.id})">✓ Approve</button>
               <button class="btn btn-secondary btn-sm" onclick="Admin.rejectProperty(${p.id})">✕ Reject</button>
             ` : ''}
-            <button class="btn btn-outline btn-sm" onclick="window.open('${_rootPath()}pages/property.html?id=${p.id}','_blank')">View Property</button>
+            <button class="btn btn-outline btn-sm" onclick="window.open('${_rootPath()}pages/property.html?id=${p.id}','_blank')">👁 View</button>
+            <button class="btn btn-sm" style="background:#ff385c;color:white;border:none;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600" onclick="Admin.deleteProperty(${p.id}, '${(p.title || '').replace(/'/g, "\\'")}')">🗑 Delete</button>
           </div>
         </div>
       `).join('');
@@ -230,7 +200,7 @@
         },
 
         async approveProperty(id) {
-            if (!confirm('Approve this property?')) return;
+            if (!confirm('Approve this property? It will become visible to all guests.')) return;
             try {
                 await API.adminApproveProperty(id);
                 Utils.toast('Property approved! 🎉');
@@ -245,6 +215,17 @@
             try {
                 await API.adminRejectProperty(id);
                 Utils.toast('Property rejected');
+                await this.loadProperties(this.currentPropertyStatus);
+            } catch (e) {
+                Utils.toast('Error: ' + e.message);
+            }
+        },
+
+        async deleteProperty(id, title) {
+            if (!confirm(`Permanently delete "${title}"?\n\nThis cannot be undone.`)) return;
+            try {
+                await API.adminDeleteProperty(id);
+                Utils.toast('Property deleted 🗑');
                 await this.loadProperties(this.currentPropertyStatus);
             } catch (e) {
                 Utils.toast('Error: ' + e.message);
@@ -268,11 +249,11 @@
               <div class="admin-card-title">${b.property?.title || 'Property'}</div>
               <div class="admin-card-meta">
                 📍 ${b.property?.city || 'N/A'} •
-                Ref: ${b.referenceId} •
+                Ref: <code>${b.referenceId}</code> •
                 ${b.nights} night${b.nights > 1 ? 's' : ''}, ${b.guests} guest${b.guests > 1 ? 's' : ''}
               </div>
               <div class="admin-card-meta">
-                👤 Guest: ${b.guest?.fullName} (${b.guest?.email}) •
+                👤 Guest: ${b.guest?.fullName || 'N/A'} (${b.guest?.email || ''}) •
                 ${Utils.formatDate(b.checkIn)} → ${Utils.formatDate(b.checkOut)}
               </div>
               <div class="admin-card-meta">
@@ -280,7 +261,11 @@
                 Booked: ${Utils.formatDateFull(b.createdAt)}
               </div>
             </div>
-            <span class="badge ${b.status === 'CONFIRMED' ? 'badge-success' : b.status === 'PENDING' ? 'badge-warning' : b.status === 'COMPLETED' ? 'badge-gray' : 'badge-danger'}">${b.status}</span>
+            <span class="badge ${
+                    b.status === 'CONFIRMED' ? 'badge-success' :
+                        b.status === 'PENDING'   ? 'badge-warning' :
+                            b.status === 'COMPLETED' ? 'badge-gray'    : 'badge-danger'
+                }">${b.status}</span>
           </div>
         </div>
       `).join('');

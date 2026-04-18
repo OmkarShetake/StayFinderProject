@@ -34,4 +34,6 @@ public interface PropertyAvailabilityRepository extends JpaRepository<PropertyAv
             @Param("propertyId") Long propertyId,
             @Param("from") LocalDate from,
             @Param("to") LocalDate to);
+
+    void deleteByPropertyId(Long propertyId);
 }
