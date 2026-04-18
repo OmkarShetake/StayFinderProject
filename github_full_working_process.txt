@@ -52,7 +52,8 @@ git remote add origin https://github.com/your-username/stayfinder.git
 
 Step 7 — Push Project to GitHub
 
-git branch -M main git push -u origin main
+git branch -M main 
+git push -u origin main
 
 Your project is now uploaded to GitHub.
 
