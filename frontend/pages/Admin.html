@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard </title>
+    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/nav.css">
+    <link rel="stylesheet" href="../css/host.css">
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="nav-logo" id="nav-logo">stayfinder</div>
+    <div class="nav-right">
+        <button class="nav-link" id="btn-explore">Explore</button>
+        <div class="nav-user" id="nav-user-btn" style="position:relative">
+            <div class="nav-ham">☰</div>
+            <div class="nav-avatar" id="nav-avatar"></div>
+            <div class="notif-dot hidden"></div>
+
+            <!-- Dropdown menu -->
+            <div class="nav-dropdown" id="nav-dropdown">
+                <div class="nav-dropdown-user hidden" id="nav-dropdown-user">
+                    <div class="nav-dropdown-avatar" id="nav-dropdown-avatar"></div>
+                    <div>
+                        <div class="nav-dropdown-name" id="nav-dropdown-name"></div>
+                        <div class="nav-dropdown-email" id="nav-dropdown-email"></div>
+                    </div>
+                </div>
+                <div class="nav-dropdown-section hidden" id="nav-dropdown-auth">
+                    <button class="nav-dropdown-item" id="nav-dropdown-trips">
+                        <span class="nav-dropdown-item-icon">🧳</span> My trips
+                    </button>
+                    <button class="nav-dropdown-item" id="nav-dropdown-admin">
+                        <span class="nav-dropdown-item-icon">⚙️</span> Admin Panel
+                    </button>
+                </div>
+                <div class="hidden" id="nav-dropdown-logout-wrap">
+                    <button class="nav-dropdown-logout" id="nav-logout">
+                        <span class="nav-dropdown-logout-icon">👋</span> Log out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div style="max-width:1200px;margin:0 auto;padding:40px 24px">
+    <h1 style="margin-bottom:8px">Admin Dashboard</h1>
+    <p class="text-muted" style="margin-bottom:32px">Manage properties, bookings, and platform operations</p>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px">
+        <button class="tab-btn active" onclick="Admin.switchTab('properties',this)">Properties</button>
+        <button class="tab-btn" onclick="Admin.switchTab('bookings',this)">All Bookings</button>
+    </div>
+
+    <!-- Properties Tab -->
+    <div id="tab-properties">
+        <!-- Property status filter -->
+        <div style="display:flex;gap:8px;margin-bottom:20px">
+            <button class="btn btn-sm active" data-status="PENDING" onclick="Admin.filterProperties('PENDING',this)">Pending</button>
+            <button class="btn btn-sm" data-status="APPROVED" onclick="Admin.filterProperties('APPROVED',this)">Approved</button>
+            <button class="btn btn-sm" data-status="REJECTED" onclick="Admin.filterProperties('REJECTED',this)">Rejected</button>
+        </div>
+        <div id="properties-list"></div>
+    </div>
+
+    <!-- Bookings Tab -->
+    <div id="tab-bookings" class="hidden">
+        <div id="bookings-list"></div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<style>
+    .tab-btn {
+        padding:12px 20px;
+        font-size:14px;
+        font-weight:600;
+        cursor:pointer;
+        border:none;
+        background:none;
+        color:var(--text-2);
+        border-bottom:2px solid transparent;
+        transition:all .15s;
+    }
+    .tab-btn:hover { color:var(--text); }
+    .tab-btn.active { color:var(--text);border-bottom-color:var(--text); }
+
+    .admin-card {
+        border:1px solid var(--border);
+        border-radius:var(--radius-lg);
+        padding:20px;
+        margin-bottom:16px;
+        background:var(--white);
+    }
+    .admin-card-header {
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        margin-bottom:12px;
+    }
+    .admin-card-title {
+        font-size:16px;
+        font-weight:700;
+        margin-bottom:4px;
+    }
+    .admin-card-meta {
+        font-size:13px;
+        color:var(--text-2);
+        margin-bottom:8px;
+    }
+    .admin-card-actions {
+        display:flex;
+        gap:8px;
+        margin-top:12px;
+    }
+    .property-img {
+        width:100%;
+        height:200px;
+        border-radius:var(--radius-md);
+        object-fit:cover;
+        margin-bottom:12px;
+        background:var(--bg);
+    }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/websocket.js"></script>
+<script>
+
+    function _rootPath() {
+        const path = window.location.pathname;
+        const marker = '/frontend/';
+        const idx = path.indexOf(marker);
+        if (idx !== -1) return path.substring(0, idx + marker.length);
+        return path.replace(/\/[^/]*$/, '/');
+    }
+
+    const Admin = {
+        currentPropertyStatus: 'PENDING',
+
+        async init() {
+            if (!Auth.require()) return;
+
+            const user = Auth.getUser();
+            if (!user || user.role !== 'ADMIN') {
+                Utils.toast('Admin access required');
+                setTimeout(() => window.location.href = _rootPath() + 'index.html', 1500);
+                return;
+            }
+
+            // Nav
+            document.getElementById('nav-logo').addEventListener('click', () => {
+                window.location.href = _rootPath() + 'index.html';
+            });
+            document.getElementById('btn-explore').addEventListener('click', () => {
+                window.location.href = _rootPath() + 'index.html';
+            });
+
+            Auth.renderNavUser();
+            await this.loadProperties('PENDING');
+            WS.connect();
+        },
+
+        switchTab(tab, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('tab-properties').classList.toggle('hidden', tab !== 'properties');
+            document.getElementById('tab-bookings').classList.toggle('hidden', tab !== 'bookings');
+            if (tab === 'bookings') this.loadBookings();
+        },
+
+        filterProperties(status, btn) {
+            document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.currentPropertyStatus = status;
+            this.loadProperties(status);
+        },
+
+        async loadProperties(status) {
+            const list = document.getElementById('properties-list');
+            list.innerHTML = '<p class="text-muted">Loading properties...</p>';
+            try {
+                const data = await API.adminGetProperties(status, 0);
+                const properties = data.content || [];
+                if (!properties.length) {
+                    list.innerHTML = `<p class="text-muted">No ${status.toLowerCase()} properties found.</p>`;
+                    return;
+                }
+                list.innerHTML = properties.map(p => `
+        <div class="admin-card">
+          ${p.images?.[0] ? `<img src="${p.images[0]}" class="property-img" alt="${p.title}">` : ''}
+          <div class="admin-card-header">
+            <div>
+              <div class="admin-card-title">${p.title}</div>
+              <div class="admin-card-meta">
+                📍 ${p.city}, ${p.state}, ${p.country} •
+                ${Utils.formatCurrency(p.pricePerNight)}/night •
+                ${p.bedrooms} bed, ${p.bathrooms} bath
+              </div>
+              <div class="admin-card-meta">
+                👤 Host: ${p.host?.fullName} (${p.host?.email}) •
+                Created: ${Utils.formatDateFull(p.createdAt)}
+              </div>
+            </div>
+            <span class="badge ${p.status === 'APPROVED' ? 'badge-success' : p.status === 'PENDING' ? 'badge-warning' : 'badge-danger'}">${p.status}</span>
+          </div>
+          ${p.description ? `<div style="font-size:14px;color:var(--text-2);margin-bottom:12px;line-height:1.5">${p.description}</div>` : ''}
+          <div class="admin-card-actions">
+            ${p.status === 'PENDING' ? `
+              <button class="btn btn-primary btn-sm" onclick="Admin.approveProperty(${p.id})">✓ Approve</button>
+              <button class="btn btn-secondary btn-sm" onclick="Admin.rejectProperty(${p.id})">✕ Reject</button>
+            ` : ''}
+            <button class="btn btn-outline btn-sm" onclick="window.open('${_rootPath()}pages/property.html?id=${p.id}','_blank')">View Property</button>
+          </div>
+        </div>
+      `).join('');
+            } catch (e) {
+                list.innerHTML = `<p class="text-muted">Failed to load properties: ${e.message}</p>`;
+            }
+        },
+
+        async approveProperty(id) {
+            if (!confirm('Approve this property?')) return;
+            try {
+                await API.adminApproveProperty(id);
+                Utils.toast('Property approved! 🎉');
+                await this.loadProperties(this.currentPropertyStatus);
+            } catch (e) {
+                Utils.toast('Error: ' + e.message);
+            }
+        },
+
+        async rejectProperty(id) {
+            if (!confirm('Reject this property?')) return;
+            try {
+                await API.adminRejectProperty(id);
+                Utils.toast('Property rejected');
+                await this.loadProperties(this.currentPropertyStatus);
+            } catch (e) {
+                Utils.toast('Error: ' + e.message);
+            }
+        },
+
+        async loadBookings() {
+            const list = document.getElementById('bookings-list');
+            list.innerHTML = '<p class="text-muted">Loading bookings...</p>';
+            try {
+                const data = await API.adminGetBookings(0);
+                const bookings = data.content || [];
+                if (!bookings.length) {
+                    list.innerHTML = '<p class="text-muted">No bookings found.</p>';
+                    return;
+                }
+                list.innerHTML = bookings.map(b => `
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <div>
+              <div class="admin-card-title">${b.property?.title || 'Property'}</div>
+              <div class="admin-card-meta">
+                📍 ${b.property?.city || 'N/A'} •
+                Ref: ${b.referenceId} •
+                ${b.nights} night${b.nights > 1 ? 's' : ''}, ${b.guests} guest${b.guests > 1 ? 's' : ''}
+              </div>
+              <div class="admin-card-meta">
+                👤 Guest: ${b.guest?.fullName} (${b.guest?.email}) •
+                ${Utils.formatDate(b.checkIn)} → ${Utils.formatDate(b.checkOut)}
+              </div>
+              <div class="admin-card-meta">
+                💰 ${Utils.formatCurrency(b.totalAmount)} •
+                Booked: ${Utils.formatDateFull(b.createdAt)}
+              </div>
+            </div>
+            <span class="badge ${b.status === 'CONFIRMED' ? 'badge-success' : b.status === 'PENDING' ? 'badge-warning' : b.status === 'COMPLETED' ? 'badge-gray' : 'badge-danger'}">${b.status}</span>
+          </div>
+        </div>
+      `).join('');
+            } catch (e) {
+                list.innerHTML = `<p class="text-muted">Failed to load bookings: ${e.message}</p>`;
+            }
+        },
+    };
+
+    document.addEventListener('DOMContentLoaded', () => Admin.init());
+</script>
+</body>
+</html>

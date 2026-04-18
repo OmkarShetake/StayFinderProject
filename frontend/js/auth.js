@@ -119,6 +119,12 @@ const Auth = {
       if (dropdownAvatar) dropdownAvatar.textContent = Utils.initials(user.fullName);
       if (dropdownName)   dropdownName.textContent   = user.fullName || 'Guest';
       if (dropdownEmail)  dropdownEmail.textContent  = user.email || '';
+
+      // Show admin panel link only for admins
+      const adminLink = document.getElementById('nav-dropdown-admin');
+      if (adminLink) {
+        adminLink.classList.toggle('hidden', user.role !== 'ADMIN');
+      }
     } else {
       if (dropdownUser)   dropdownUser.classList.add('hidden');
       if (dropdownGuest)  dropdownGuest.classList.remove('hidden');
@@ -132,6 +138,7 @@ const Auth = {
     this._on('nav-dropdown-trips',    () => { window.location.href = root + 'pages/trips.html'; });
     this._on('nav-dropdown-wishlist', () => { window.location.href = root + 'pages/wishlist.html'; });
     this._on('nav-dropdown-host-link',() => { window.location.href = root + 'pages/host.html'; });
+    this._on('nav-dropdown-admin',    () => { window.location.href = root + 'pages/admin.html'; });
     this._on('nav-logout',            () => { Auth.logout(); });
 
     this._initDropdownToggle();
