@@ -40,7 +40,7 @@ public class ReviewService {
 
         BigDecimal overall = BigDecimal.valueOf(
                 (req.getCleanliness() + req.getCommunication() + req.getCheckin() +
-                 req.getLocation() + req.getValue() + req.getAccuracy()) / 6.0
+                        req.getLocation() + req.getValue() + req.getAccuracy()) / 6.0
         ).setScale(2, RoundingMode.HALF_UP);
 
         Review review = Review.builder()
@@ -83,16 +83,16 @@ public class ReviewService {
         RatingSummary s = new RatingSummary();
         s.setTotalReviews((int) count);
         if (avgs != null && avgs.length == 6) {
-            s.setCleanliness(toBD(avgs[0]));
-            s.setCommunication(toBD(avgs[1]));
-            s.setCheckin(toBD(avgs[2]));
-            s.setLocation(toBD(avgs[3]));
-            s.setValue(toBD(avgs[4]));
-            s.setAccuracy(toBD(avgs[5]));
-            s.setOverall(s.getCleanliness()
-                    .add(s.getCommunication()).add(s.getCheckin())
-                    .add(s.getLocation()).add(s.getValue()).add(s.getAccuracy())
-                    .divide(BigDecimal.valueOf(6), 2, RoundingMode.HALF_UP));
+            s.setCleanliness(toDouble(avgs[0]));
+            s.setCommunication(toDouble(avgs[1]));
+            s.setCheckin(toDouble(avgs[2]));
+            s.setLocation(toDouble(avgs[3]));
+            s.setValue(toDouble(avgs[4]));
+            s.setAccuracy(toDouble(avgs[5]));
+            // Calculate overall as average of all 6 ratings
+            double sum = s.getCleanliness() + s.getCommunication() + s.getCheckin() +
+                    s.getLocation() + s.getValue() + s.getAccuracy();
+            s.setOverall(Math.round(sum / 6.0 * 100.0) / 100.0); // round to 2 decimals
         }
         return s;
     }
@@ -107,8 +107,9 @@ public class ReviewService {
         }
     }
 
-    private BigDecimal toBD(Object val) {
-        return val != null ? BigDecimal.valueOf(((Number) val).doubleValue())
-                .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+    private Double toDouble(Object val) {
+        if (val == null) return 0.0;
+        double d = ((Number) val).doubleValue();
+        return Math.round(d * 100.0) / 100.0; // round to 2 decimal places
     }
 }

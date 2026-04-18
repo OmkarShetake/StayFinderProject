@@ -55,13 +55,14 @@ public class ReviewDTOs {
 
     @Data
     public static class RatingSummary {
-        private BigDecimal overall;
-        private BigDecimal cleanliness;
-        private BigDecimal communication;
-        private BigDecimal checkin;
-        private BigDecimal location;
-        private BigDecimal value;
-        private BigDecimal accuracy;
+        // FIXED: Use Double instead of BigDecimal so JSON serializes as plain numbers
+        private Double overall;
+        private Double cleanliness;
+        private Double communication;
+        private Double checkin;
+        private Double location;
+        private Double value;
+        private Double accuracy;
         private int totalReviews;
     }
 }
