@@ -10,6 +10,7 @@ import com.stayfinder.repository.BookingRepository;
 import com.stayfinder.repository.PropertyRepository;
 import com.stayfinder.repository.UserRepository;
 import com.stayfinder.repository.ReviewRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -258,6 +259,71 @@ public class BookingService {
                 "Booking cancelled",
                 b.getGuest().getFullName() + " cancelled their booking for " + b.getProperty().getTitle(),
                 "BOOKING_CANCELLED", bookingId);
+        return BookingResponse.from(b);
+    }
+
+    /* ── Modify booking dates / guests ──────────────────────────── */
+    @Transactional
+    public BookingResponse modifyBooking(Long bookingId,
+                                         @Valid ModifyBookingRequest req,
+                                         Long guestId) {
+        Booking b = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new StayFinderException("Booking not found"));
+
+        if (!b.getGuest().getId().equals(guestId)) {
+            throw new StayFinderException("Unauthorized");
+        }
+        if (b.getStatus() != BookingStatus.CONFIRMED &&
+                b.getStatus() != BookingStatus.PENDING) {
+            throw new StayFinderException("Only confirmed or pending bookings can be modified");
+        }
+        if (req.getCheckIn().isBefore(LocalDate.now())) {
+            throw new StayFinderException("Check-in date cannot be in the past");
+        }
+        if (!req.getCheckOut().isAfter(req.getCheckIn())) {
+            throw new StayFinderException("Check-out must be after check-in");
+        }
+        if (req.getGuests() > b.getProperty().getMaxGuests()) {
+            throw new StayFinderException(
+                    "Exceeds maximum guests (" + b.getProperty().getMaxGuests() + ")");
+        }
+
+        // Check availability — exclude current booking to avoid self-conflict
+        boolean conflict = bookingRepository.existsConflictExcluding(
+                b.getProperty().getId(), req.getCheckIn(), req.getCheckOut(), bookingId);
+        if (conflict) {
+            throw new StayFinderException("Property is not available for the selected dates");
+        }
+
+        // Recalculate price with new dates
+        int nights            = (int) ChronoUnit.DAYS.between(req.getCheckIn(), req.getCheckOut());
+        BigDecimal baseAmount = calculateBaseAmount(
+                b.getProperty(), req.getCheckIn(), req.getCheckOut(), nights);
+        BigDecimal serviceFee = baseAmount
+                .multiply(BigDecimal.valueOf(serviceFeePercent))
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        BigDecimal totalAmount = baseAmount.add(b.getCleaningFee()).add(serviceFee);
+
+        // Apply changes
+        b.setCheckIn(req.getCheckIn());
+        b.setCheckOut(req.getCheckOut());
+        b.setGuests(req.getGuests());
+        b.setNights(nights);
+        b.setBaseAmount(baseAmount);
+        b.setServiceFee(serviceFee);
+        b.setTotalAmount(totalAmount);
+        bookingRepository.save(b);
+
+        // Notify host
+        notificationService.createAndSend(
+                b.getProperty().getHost().getId(),
+                "Booking dates changed 📅",
+                b.getGuest().getFullName() + " changed their booking for " +
+                        b.getProperty().getTitle() + " to " +
+                        req.getCheckIn() + " → " + req.getCheckOut(),
+                "BOOKING_MODIFIED", bookingId);
+
+        log.info("Booking {} modified by guest {}", b.getReferenceId(), guestId);
         return BookingResponse.from(b);
     }
 

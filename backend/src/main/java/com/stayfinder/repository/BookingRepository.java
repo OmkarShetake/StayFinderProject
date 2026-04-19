@@ -30,9 +30,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         AND b.checkOut > :checkIn
     """)
     boolean existsConflict(
-            @Param("propertyId") Long propertyId,
-            @Param("checkIn") LocalDate checkIn,
-            @Param("checkOut") LocalDate checkOut);
+            @Param("propertyId") Long      propertyId,
+            @Param("checkIn")    LocalDate checkIn,
+            @Param("checkOut")   LocalDate checkOut);
+
+    /* Same as existsConflict but excludes a specific booking (used for modifications) */
+    @Query("""
+        SELECT COUNT(b) > 0 FROM Booking b
+        WHERE b.property.id = :propertyId
+        AND b.id            != :excludeId
+        AND b.status IN ('CONFIRMED','PENDING')
+        AND b.checkIn  < :checkOut
+        AND b.checkOut > :checkIn
+    """)
+    boolean existsConflictExcluding(
+            @Param("propertyId") Long      propertyId,
+            @Param("checkIn")    LocalDate checkIn,
+            @Param("checkOut")   LocalDate checkOut,
+            @Param("excludeId")  Long      excludeId);
 
     @Query("""
         SELECT b FROM Booking b

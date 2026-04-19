@@ -92,6 +92,62 @@
   </div>
 </div>
 
+<!-- Modify Booking Modal -->
+<div class="modal-overlay hidden" id="modify-modal">
+  <div class="modal" style="width:460px">
+    <button class="modal-close" onclick="Utils.hideModal('modify-modal')">✕</button>
+    <h3 style="margin-bottom:6px">Change your dates</h3>
+    <p class="text-muted" style="font-size:13px;margin-bottom:20px" id="modify-property-name"></p>
+    <input type="hidden" id="modify-booking-id">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group">
+        <label class="form-label">Check in</label>
+        <input type="date" class="form-input" id="modify-checkin">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Check out</label>
+        <input type="date" class="form-input" id="modify-checkout">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Guests</label>
+      <input type="number" class="form-input" id="modify-guests" min="1" max="16" value="1">
+    </div>
+    <!-- Price preview -->
+    <div id="modify-price-preview" class="hidden"
+         style="background:var(--bg);border-radius:var(--radius-md);
+                padding:14px;margin-bottom:16px;font-size:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span id="modify-pb-label" style="color:var(--text-2)"></span>
+        <span id="modify-pb-base"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="color:var(--text-2)">Cleaning fee</span>
+        <span id="modify-pb-cleaning"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="color:var(--text-2)">Service fee</span>
+        <span id="modify-pb-service"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;
+                  border-top:1px solid var(--border);padding-top:10px;margin-top:4px">
+        <span>New total</span>
+        <span id="modify-pb-total"></span>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-outline btn-full" id="modify-preview-btn"
+              onclick="Trips.previewModifyPrice()">
+        Preview new price
+      </button>
+      <button class="btn btn-primary btn-full" id="modify-submit-btn"
+              onclick="Trips.submitModify()">
+        Confirm change
+      </button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <style>
@@ -198,7 +254,9 @@
           <div class="trip-price">${Utils.formatCurrency(b.totalAmount)}</div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <span class="badge ${b.status === 'CONFIRMED' ? 'badge-success' : b.status === 'PENDING' ? 'badge-warning' : b.status === 'COMPLETED' ? 'badge-gray' : 'badge-danger'}">${b.status}</span>
-            ${b.status === 'CONFIRMED' || b.status === 'PENDING' ? `<button class="btn btn-secondary btn-sm" onclick="Trips.cancel(${b.id})">Cancel</button>` : ''}
+            ${b.status === 'CONFIRMED' || b.status === 'PENDING' ? `
+              <button class="btn btn-secondary btn-sm" onclick="Trips.cancel(${b.id})">Cancel</button>
+              <button class="btn btn-outline btn-sm" onclick="Trips.openModify(${b.id}, '${(b.property?.title || '').replace(/'/g, "\\'")}', '${b.checkIn}', '${b.checkOut}', ${b.guests}, ${b.property?.id})">Change dates</button>` : ''}
             ${b.canReview ? `<button class="btn btn-outline btn-sm" onclick="Trips.openReview(${b.id})">Write review</button>` : ''}
           </div>
           <div class="trip-ref mt-8">Ref: ${b.referenceId}</div>
@@ -218,6 +276,73 @@
     openReview(bookingId) {
       document.getElementById('review-booking-id').value = bookingId;
       Utils.showModal('review-modal');
+    },
+
+    openModify(bookingId, propertyTitle, checkIn, checkOut, guests, propertyId) {
+      document.getElementById('modify-booking-id').value    = bookingId;
+      document.getElementById('modify-property-name').textContent = propertyTitle;
+      document.getElementById('modify-checkin').value       = checkIn;
+      document.getElementById('modify-checkout').value      = checkOut;
+      document.getElementById('modify-guests').value        = guests;
+      document.getElementById('modify-price-preview').classList.add('hidden');
+      // Store propertyId for price preview
+      document.getElementById('modify-booking-id').dataset.propertyId = propertyId;
+      Utils.showModal('modify-modal');
+    },
+
+    async previewModifyPrice() {
+      const propertyId = document.getElementById('modify-booking-id').dataset.propertyId;
+      const checkIn    = document.getElementById('modify-checkin').value;
+      const checkOut   = document.getElementById('modify-checkout').value;
+      const guests     = document.getElementById('modify-guests').value;
+
+      if (!checkIn || !checkOut) { Utils.toast('Please select dates'); return; }
+
+      const btn = document.getElementById('modify-preview-btn');
+      btn.disabled    = true;
+      btn.textContent = 'Loading...';
+
+      try {
+        const data   = await API.pricePreview({ propertyId: parseInt(propertyId), checkIn, checkOut, guests: parseInt(guests) });
+        const nights = data.nights || 0;
+
+        document.getElementById('modify-pb-label').textContent    = `${Utils.formatCurrency(data.pricePerNight)} × ${nights} night${nights > 1 ? 's' : ''}`;
+        document.getElementById('modify-pb-base').textContent     = Utils.formatCurrency(data.baseAmount);
+        document.getElementById('modify-pb-cleaning').textContent = Utils.formatCurrency(data.cleaningFee);
+        document.getElementById('modify-pb-service').textContent  = Utils.formatCurrency(data.serviceFee);
+        document.getElementById('modify-pb-total').textContent    = Utils.formatCurrency(data.totalAmount);
+        document.getElementById('modify-price-preview').classList.remove('hidden');
+      } catch (e) {
+        Utils.toast('Error: ' + e.message);
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Preview new price';
+      }
+    },
+
+    async submitModify() {
+      const bookingId = document.getElementById('modify-booking-id').value;
+      const checkIn   = document.getElementById('modify-checkin').value;
+      const checkOut  = document.getElementById('modify-checkout').value;
+      const guests    = parseInt(document.getElementById('modify-guests').value);
+
+      if (!checkIn || !checkOut) { Utils.toast('Please select dates'); return; }
+
+      const btn = document.getElementById('modify-submit-btn');
+      btn.disabled    = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        await API.modifyBooking(parseInt(bookingId), { checkIn, checkOut, guests });
+        Utils.hideModal('modify-modal');
+        Utils.toast('Booking updated! ✅');
+        await this.load();
+      } catch (e) {
+        Utils.toast('Error: ' + e.message);
+      } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Confirm change';
+      }
     },
 
     async submitReview() {

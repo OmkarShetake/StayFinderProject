@@ -244,16 +244,14 @@ const Search = {
     const checkOut = document.getElementById('sm-checkout')?.value       || '';
     const guests   = document.getElementById('sm-guests')?.value         || '';
 
-    this.currentParams = { ...this.currentParams, city, checkIn, checkOut, guests };
-    this.currentPage   = 0;
+    // Build query string and redirect to dedicated search page
+    const params = new URLSearchParams();
+    if (city)     params.set('city',     city);
+    if (checkIn)  params.set('checkIn',  checkIn);
+    if (checkOut) params.set('checkOut', checkOut);
+    if (guests)   params.set('guests',   guests);
 
-    document.getElementById('ns-city').textContent     = city     || 'Anywhere';
-    document.getElementById('ns-checkin').textContent  = checkIn  ? Utils.formatDate(checkIn)  : 'Add dates';
-    document.getElementById('ns-checkout').textContent = checkOut ? Utils.formatDate(checkOut) : 'Add dates';
-    document.getElementById('ns-guests').textContent   = guests   ? guests + ' guest(s)'       : 'Add guests';
-
-    Utils.hideModal('search-modal');
-    this.loadProperties();
+    window.location.href = this._rootPath() + `pages/search.html?${params.toString()}`;
   },
 
   /* ── Color Map ───────────────────────────────────────────────── */

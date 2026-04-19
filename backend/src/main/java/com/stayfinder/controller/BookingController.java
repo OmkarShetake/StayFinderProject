@@ -20,7 +20,8 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    // ── Guest ─────────────────────────────────────────────────────
+    /* ── Guest endpoints ─────────────────────────────────────────── */
+
     @PostMapping("/bookings")
     public ResponseEntity<BookingResponse> createBooking(
             @Valid @RequestBody CreateBookingRequest request,
@@ -31,7 +32,7 @@ public class BookingController {
 
     @GetMapping("/bookings")
     public ResponseEntity<Page<BookingResponse>> getMyBookings(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(bookingService.getMyBookings(user.getId(), page, size));
@@ -51,16 +52,26 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.cancelBooking(id, user.getId()));
     }
 
+    /* ── Modify booking dates / guests ───────────────────────────── */
+    @PatchMapping("/bookings/{id}/modify")
+    public ResponseEntity<BookingResponse> modifyBooking(
+            @PathVariable Long id,
+            @Valid @RequestBody ModifyBookingRequest request,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(bookingService.modifyBooking(id, request, user.getId()));
+    }
+
     @PostMapping("/bookings/price-preview")
     public ResponseEntity<PricePreviewResponse> pricePreview(
             @Valid @RequestBody PricePreviewRequest request) {
         return ResponseEntity.ok(bookingService.previewPrice(request));
     }
 
-    // ── Host ──────────────────────────────────────────────────────
+    /* ── Host endpoints ──────────────────────────────────────────── */
+
     @GetMapping("/host/bookings")
     public ResponseEntity<Page<BookingResponse>> getHostBookings(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "10") int size,
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(bookingService.getHostBookings(user.getId(), page, size));
@@ -80,10 +91,11 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.rejectBooking(id, user.getId()));
     }
 
-    // ── Admin ─────────────────────────────────────────────────────
+    /* ── Admin endpoints ─────────────────────────────────────────── */
+
     @GetMapping("/admin/bookings")
     public ResponseEntity<Page<BookingResponse>> adminBookings(
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0")  int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(bookingService.getAllBookings(page, size));
     }
