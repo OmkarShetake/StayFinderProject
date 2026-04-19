@@ -4,17 +4,20 @@ server:
 spring:
   application:
     name: stayfinder
+
   threads:
     virtual:
       enabled: true
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/stayfinder_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url:             ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/stayfinder_db}
+    username:        ${SPRING_DATASOURCE_USERNAME:postgres}
+    password:        ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
-      minimum-idle: 5
+      minimum-idle:      5
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -22,32 +25,59 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   flyway:
-    enabled: true
+    enabled:   true
     locations: classpath:db/migration
+
   web:
     resources:
       static-locations: classpath:/static/
 
+  # ── Email (Gmail SMTP) ──────────────────────────────────────────
+  mail:
+    host:     smtp.gmail.com
+    port:     587
+    username: ${MAIL_USERNAME:your-gmail@gmail.com}
+    password: ${MAIL_PASSWORD:your-app-password}
+    properties:
+      mail:
+        smtp:
+          auth:            true
+          starttls:
+            enable:   true
+            required: true
+        debug: false
+
+# ── JWT ─────────────────────────────────────────────────────────────
 jwt:
-  secret: ${JWT_SECRET:stayfinder-super-secret-jwt-key-256-bits-long-change-in-prod}
-  expiration: 86400000
+  secret:             ${JWT_SECRET:stayfinder-super-secret-jwt-key-256-bits-long-change-in-prod}
+  expiration:         86400000
   refresh-expiration: 604800000
 
+# ── StayFinder ───────────────────────────────────────────────────────
 stayfinder:
   cors:
     allowed-origins: "http://localhost:3000,http://localhost:80,http://localhost,http://localhost:5500,http://127.0.0.1:5500,http://localhost:8080,http://127.0.0.1:3000,http://localhost:63342,http://127.0.0.1:63342,http://localhost:5173,http://localhost:4200"
   service-fee-percent: 12
   cleaning-fee-default: 800
+  mail:
+    enabled: ${MAIL_ENABLED:true}   # set to false to disable emails during dev/testing
+    from:    ${MAIL_FROM:StayFinder <noreply@stayfinder.com>}
 
+# ── Actuator ────────────────────────────────────────────────────────
 management:
+  health:
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:
         include: health,info
-
+# ── Logging ─────────────────────────────────────────────────────────
 logging:
   level:
-    com.stayfinder: DEBUG
+    com.stayfinder:              DEBUG
     org.springframework.security: INFO
     org.springframework.web.socket: INFO
+    org.springframework.mail:    WARN

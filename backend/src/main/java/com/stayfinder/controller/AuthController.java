@@ -44,4 +44,5 @@ public class AuthController {
     public ResponseEntity<UserResponse> me(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(UserResponse.from(user));
     }
+    
 }
