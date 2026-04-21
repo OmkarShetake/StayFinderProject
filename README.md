@@ -469,7 +469,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 **Built with ❤️ by Omkar Shetake**
 
 [![GitHub](https://img.shields.io/badge/GitHub-omkarshetake-181717?style=for-the-badge&logo=github)](https://github.com/omkarshetake)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/omkarshetake)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/omkar-shetake-53356b285/)
 
 *If this project helped you, please consider giving it a ⭐*
 
