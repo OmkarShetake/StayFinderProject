@@ -2,11 +2,14 @@
 'use strict';
 
 const API = {
-    // When served via nginx (port 3000 or 80) use relative URL so nginx proxies to backend.
-    // Any other port (IntelliJ :63342, python :5500, live-server :5173, etc.) → hit backend directly.
-    BASE: (['3000','80','443',''].includes(window.location.port))
-        ? '/api/v1'
-        : 'http://localhost:8080/api/v1',
+    /* ── Base URL ────────────────────────────────────────────────── */
+    // localhost → hit backend directly
+    // Railway production → use backend Railway URL
+    BASE: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? ((['3000','80','443',''].includes(window.location.port))
+            ? '/api/v1'
+            : 'http://localhost:8080/api/v1')
+        : 'https://YOUR-BACKEND-NAME.up.railway.app/api/v1',
 
     /* Build headers */
     _headers(auth = true) {

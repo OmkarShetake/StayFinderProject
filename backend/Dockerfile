@@ -1,13 +1,26 @@
+# ── Stage 1: Build ───────────────────────────────────────────────
 FROM eclipse-temurin:21-jdk-alpine AS build
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
-RUN apk add --no-cache maven && mvn clean package -DskipTests
 
+# Copy maven wrapper and pom first (better layer caching)
+COPY mvnw .
+COPY .mvn .mvn
+COPY pom.xml .
+
+# Download dependencies
+RUN ./mvnw dependency:go-offline -B
+
+# Copy source and build
+COPY src src
+RUN ./mvnw clean package -DskipTests
+
+# ── Stage 2: Run ─────────────────────────────────────────────────
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-COPY --from=build /app/target/*.jar app.jar
-USER appuser
+
+# Copy built jar from build stage
+COPY --from=build /app/target/stayfinder-1.0.0.jar app.jar
+
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","-Djava.security.egd=file:/dev/./urandom","app.jar"]
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

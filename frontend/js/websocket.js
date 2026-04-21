@@ -1,49 +1,66 @@
-/* ── StayFinder WebSocket / Notifications ──────────────────────── */
+/* ── StayFinder WebSocket Client ───────────────────────────────── */
 'use strict';
 
 const WS = {
-  client: null,
-  connected: false,
-  _handlers: [],
 
-  /* Connect to STOMP WebSocket */
-  connect() {
-    if (!Auth.isLoggedIn() || this.connected) return;
+  client:       null,
+  connected:    false,
+  _notifHandler: null,
 
-    const token = Auth.getToken();
-    const socket = new SockJS('/ws');
-    this.client = Stomp.over(socket);
-    this.client.debug = null; // silence STOMP logs
-
-    this.client.connect(
-      { Authorization: 'Bearer ' + token },
-      () => {
-        this.connected = true;
-        const user = Auth.getUser();
-        if (!user) return;
-
-        // Subscribe to personal notification queue
-        this.client.subscribe(
-          `/user/${user.id}/queue/notifications`,
-          (msg) => {
-            try {
-              const notif = JSON.parse(msg.body);
-              this._onNotification(notif);
-            } catch {}
-          }
-        );
-        console.log('WS connected for user', user.id);
-      },
-      (err) => {
-        this.connected = false;
-        console.warn('WS connection failed:', err);
-        // Retry after 5s
-        setTimeout(() => this.connect(), 5000);
-      }
-    );
+  /* ── Resolve WebSocket backend URL ──────────────────────────── */
+  _wsUrl() {
+    const isLocal = window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1';
+    if (isLocal) {
+      // Local dev — connect directly to Spring Boot
+      return 'http://localhost:8080/ws';
+    }
+    // Production — connect to Railway backend
+    return 'https://YOUR-BACKEND-NAME.up.railway.app/ws';
   },
 
-  /* Disconnect */
+  /* ── Connect ─────────────────────────────────────────────────── */
+  connect() {
+    if (this.connected || !Auth.isLoggedIn()) return;
+
+    try {
+      const socket = new SockJS(this._wsUrl());
+      this.client  = Stomp.over(socket);
+
+      // Suppress STOMP console logs
+      this.client.debug = () => {};
+
+      this.client.connect(
+          { Authorization: 'Bearer ' + Auth.getToken() },
+          () => {
+            this.connected = true;
+            const userId   = Auth.getUser()?.id;
+            if (!userId) return;
+
+            // Subscribe to personal notification queue
+            this.client.subscribe(
+                `/user/${userId}/queue/notifications`,
+                msg => {
+                  try {
+                    const notification = JSON.parse(msg.body);
+                    this._handleNotification(notification);
+                  } catch (e) {
+                    console.warn('WS notification parse error:', e.message);
+                  }
+                }
+            );
+          },
+          err => {
+            this.connected = false;
+            console.warn('WebSocket connection failed:', err);
+          }
+      );
+    } catch (e) {
+      console.warn('WebSocket init failed:', e.message);
+    }
+  },
+
+  /* ── Disconnect ──────────────────────────────────────────────── */
   disconnect() {
     if (this.client && this.connected) {
       this.client.disconnect();
@@ -51,37 +68,41 @@ const WS = {
     }
   },
 
-  /* Register handler */
-  onNotification(fn) {
-    this._handlers.push(fn);
-  },
-
-  /* Internal: dispatch notification */
-  _onNotification(notif) {
-    // Update unread badge
-    WS.incrementUnreadBadge();
-    // Show toast
-    Utils.toast(notif.title);
-    // Call all registered handlers
-    this._handlers.forEach(fn => fn(notif));
-  },
-
-  /* Increment unread badge in navbar */
-  incrementUnreadBadge() {
+  /* ── Handle incoming notification ───────────────────────────── */
+  _handleNotification(notification) {
+    // Update unread dot
     const dot = document.querySelector('.notif-dot');
     if (dot) dot.classList.remove('hidden');
+
+    // Call custom handler if registered
+    if (typeof this._notifHandler === 'function') {
+      this._notifHandler(notification);
+    }
+
+    // Show toast for important notifications
+    if (notification.title) {
+      Utils.toast('🔔 ' + notification.title);
+    }
   },
 
-  /* Load unread count from API on page load */
+  /* ── Register notification handler ──────────────────────────── */
+  onNotification(fn) {
+    this._notifHandler = fn;
+  },
+
+  /* ── Load unread count on page load ─────────────────────────── */
   async loadUnreadCount() {
     if (!Auth.isLoggedIn()) return;
     try {
-      const data = await API.getUnreadCount();
-      const dot = document.querySelector('.notif-dot');
-      if (dot && data.count > 0) dot.classList.remove('hidden');
-      else if (dot) dot.classList.add('hidden');
-    } catch {}
+      const data  = await API.getUnreadCount();
+      const count = data.count || data || 0;
+      const dot   = document.querySelector('.notif-dot');
+      if (dot && count > 0) dot.classList.remove('hidden');
+    } catch (e) {
+      console.warn('Could not load unread count:', e.message);
+    }
   },
+
 };
 
 window.WS = WS;
