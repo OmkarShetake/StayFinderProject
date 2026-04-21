@@ -11,12 +11,14 @@ const WS = {
   _wsUrl() {
     const isLocal = window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1';
+
     if (isLocal) {
-      // Local dev — connect directly to Spring Boot
-      return 'http://localhost:8080/ws';
+      // Local development
+      return 'ws://localhost:8080/ws';
     }
-    // Production — connect to Railway backend
-    return 'https://YOUR-BACKEND-NAME.up.railway.app/ws';
+
+    // Production (Render backend)
+    return 'wss://stayfinder-backend-5en8.onrender.com/ws';
   },
 
   /* ── Connect ─────────────────────────────────────────────────── */

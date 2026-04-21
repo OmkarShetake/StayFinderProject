@@ -9,7 +9,7 @@ const API = {
         ? ((['3000','80','443',''].includes(window.location.port))
             ? '/api/v1'
             : 'http://localhost:8080/api/v1')
-        : 'https://YOUR-BACKEND-NAME.up.railway.app/api/v1',
+        : 'https://stayfinder-backend-5en8.onrender.com/api/v1',
 
     /* Build headers */
     _headers(auth = true) {
