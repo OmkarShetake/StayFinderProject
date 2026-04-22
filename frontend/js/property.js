@@ -20,10 +20,19 @@ const PropertyPage = {
   /* ── Root Path ───────────────────────────────────────────────── */
   _rootPath() {
     const path   = window.location.pathname;
+
+    // Local dev — has /frontend/ in path
     const marker = '/frontend/';
     const idx    = path.indexOf(marker);
     if (idx !== -1) return path.substring(0, idx + marker.length);
-    return path.replace(/\/[^/]*$/, '/');
+
+    // Production — in /pages/ subfolder, go up one level
+    if (path.includes('/pages/')) {
+      return path.substring(0, path.indexOf('/pages/') + 1);
+    }
+
+    // Already at root
+    return '/';
   },
 
   /* ── Init ────────────────────────────────────────────────────── */
