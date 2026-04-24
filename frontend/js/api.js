@@ -53,6 +53,7 @@ const API = {
     refresh:  (body)  => API._req('POST', '/auth/refresh', body, false),
     me:       ()      => API._req('GET',  '/auth/me'),
     becomeHost: ()    => API._req('POST', '/auth/become-host'),
+    updateProfile: (body) => API._req('PATCH', '/auth/profile', body),
 
     /* ── Properties ─────────────────────────────────────────────── */
     searchProperties: (params) =>

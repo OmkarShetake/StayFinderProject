@@ -156,6 +156,25 @@ public class AuthService {
         log.info("User {} became a host", user.getEmail());
     }
 
+    /* ── Update profile ──────────────────────────────────────────── */
+    @Transactional
+    public UserResponse updateProfile(Long userId, UpdateProfileRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new StayFinderException("User not found"));
+        if (request.getFullName() != null && !request.getFullName().isBlank()) {
+            user.setFullName(request.getFullName().trim());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone().trim());
+        }
+        if (request.getAvatarUrl() != null) {
+            user.setAvatarUrl(request.getAvatarUrl().trim());
+        }
+        userRepository.save(user);
+        log.info("Profile updated for user {}", user.getEmail());
+        return UserResponse.from(user);
+    }
+
     /* ── Token building ──────────────────────────────────────────── */
     private TokenResponse buildTokenResponse(User user) {
         String accessToken = jwtUtil.generateToken(user);

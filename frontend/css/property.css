@@ -562,3 +562,73 @@
   .lightbox-next { right: 8px; }
   .lightbox-nav { width: 40px; height: 40px; font-size: 24px; }
 }
+
+/* ── Sticky Mobile Price Bar ─────────────────────────────────────── */
+.mobile-price-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  z-index: 150;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+}
+.mobile-price-bar-left {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.mobile-price-bar-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+.mobile-price-bar-label {
+  font-size: 13px;
+  color: var(--text-2);
+}
+.mobile-price-bar-btn {
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #e61e4d, #e31c5f, #d70466);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity var(--transition);
+  flex-shrink: 0;
+}
+.mobile-price-bar-btn:hover { opacity: .92; }
+
+@media (max-width: 768px) {
+  .mobile-price-bar { display: flex; }
+  /* Add padding so content isn't hidden behind the bar */
+  .detail-page { padding-bottom: 80px; }
+}
+
+/* ── Show more reviews button ────────────────────────────────────── */
+.show-more-reviews-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 12px 24px;
+  border: 1px solid var(--text);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.show-more-reviews-btn:hover {
+  background: var(--text);
+  color: var(--white);
+}

@@ -32,6 +32,14 @@ public class AuthDTOs {
     }
 
     @Data
+    public static class UpdateProfileRequest {
+        @NotBlank
+        private String fullName;
+        private String phone;
+        private String avatarUrl;
+    }
+
+    @Data
     public static class TokenResponse {
         private String accessToken;
         private String refreshToken;

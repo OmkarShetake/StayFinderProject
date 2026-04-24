@@ -157,35 +157,54 @@ const Search = {
   },
 
   /* ── Build Card ──────────────────────────────────────────────── */
-  /*
-   * SECURITY: All user-generated strings are wrapped with Utils.esc()
-   * to prevent XSS injection via innerHTML.
-   */
   _buildCard(p) {
     const div      = document.createElement('div');
     div.className  = 'prop-card';
     div.dataset.id = p.id;
 
-    // Sanitize all user-generated content
-    const title     = Utils.esc(p.title);
     const city      = Utils.esc(p.city);
     const state     = Utils.esc(p.state);
     const imgAlt    = Utils.esc(p.title);
-    const imgSrc    = Utils.esc(p.images?.[0] || '');
     const typeLabel = Utils.esc(Utils.propertyTypeLabel(p.propertyType));
     const beds      = Number(p.beds)      || 0;
     const rating    = Number(p.avgRating) || 0;
     const price     = Utils.formatCurrency(p.pricePerNight);
     const isSaved   = this.wishlistIds.has(p.id);
+    const images    = p.images || [];
+    const hasMultiple = images.length > 1;
+
+    // Build carousel slides
+    const slides = images.length
+      ? images.map((src, i) =>
+          `<div class="carousel-slide${i === 0 ? ' active' : ''}" data-idx="${i}">
+             <img src="${Utils.esc(src)}" alt="${imgAlt}" loading="${i === 0 ? 'eager' : 'lazy'}">
+           </div>`
+        ).join('')
+      : `<div class="carousel-slide active">
+           <div class="prop-card-img-placeholder" style="background:${this._colorForType(p.category)}">
+             ${Utils.categoryIcon(p.category)}
+           </div>
+         </div>`;
+
+    // Dots
+    const dots = hasMultiple
+      ? `<div class="carousel-dots">
+           ${images.map((_, i) =>
+             `<span class="carousel-dot${i === 0 ? ' active' : ''}"></span>`
+           ).join('')}
+         </div>`
+      : '';
 
     div.innerHTML = `
       <div class="prop-card-img">
-        ${imgSrc
-        ? `<img class="prop-card-img-inner" src="${imgSrc}" alt="${imgAlt}" loading="lazy">`
-        : `<div class="prop-card-img-placeholder" style="background:${this._colorForType(p.category)}">
-               ${Utils.categoryIcon(p.category)}
-             </div>`
-    }
+        <div class="carousel" data-current="0">
+          ${slides}
+        </div>
+        ${hasMultiple ? `
+          <button class="carousel-btn carousel-btn-prev" aria-label="Previous">&#8249;</button>
+          <button class="carousel-btn carousel-btn-next" aria-label="Next">&#8250;</button>
+        ` : ''}
+        ${dots}
         <div class="prop-heart" data-id="${p.id}" title="Save to wishlist">
           ${isSaved ? '❤️' : '🤍'}
         </div>
@@ -194,10 +213,7 @@ const Search = {
       <div class="prop-card-info">
         <div class="prop-card-row1">
           <div class="prop-card-loc">${city}${state ? ', ' + state : ''}</div>
-          ${rating > 0
-        ? `<div class="prop-card-rating">★ ${rating.toFixed(2)}</div>`
-        : ''
-    }
+          ${rating > 0 ? `<div class="prop-card-rating">★ ${rating.toFixed(2)}</div>` : ''}
         </div>
         <div class="prop-card-type">${typeLabel} · ${beds} bed${beds !== 1 ? 's' : ''}</div>
         <div class="prop-card-price"><strong>${price}</strong> night</div>
@@ -206,6 +222,7 @@ const Search = {
     // Navigate to property detail
     div.addEventListener('click', e => {
       if (e.target.closest('.prop-heart')) return;
+      if (e.target.closest('.carousel-btn')) return;
       window.location.href = this._rootPath() + `pages/property.html?id=${p.id}`;
     });
 
@@ -214,6 +231,36 @@ const Search = {
       e.stopPropagation();
       this._toggleWishlist(p.id, div.querySelector('.prop-heart'));
     });
+
+    // Carousel prev/next
+    if (hasMultiple) {
+      const carousel = div.querySelector('.carousel');
+      const allSlides = div.querySelectorAll('.carousel-slide');
+      const allDots   = div.querySelectorAll('.carousel-dot');
+
+      const goTo = (idx) => {
+        const cur = parseInt(carousel.dataset.current);
+        allSlides[cur].classList.remove('active');
+        allDots[cur]?.classList.remove('active');
+        carousel.dataset.current = idx;
+        allSlides[idx].classList.add('active');
+        allDots[idx]?.classList.add('active');
+      };
+
+      div.querySelector('.carousel-btn-prev').addEventListener('click', e => {
+        e.stopPropagation();
+        const cur   = parseInt(carousel.dataset.current);
+        const prev  = (cur - 1 + images.length) % images.length;
+        goTo(prev);
+      });
+
+      div.querySelector('.carousel-btn-next').addEventListener('click', e => {
+        e.stopPropagation();
+        const cur  = parseInt(carousel.dataset.current);
+        const next = (cur + 1) % images.length;
+        goTo(next);
+      });
+    }
 
     return div;
   },

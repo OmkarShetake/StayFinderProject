@@ -162,3 +162,181 @@
 @media (max-width: 480px) {
   .prop-grid { padding: 12px 12px 32px; gap: 12px; }
 }
+
+/* ── Inspiration Section ─────────────────────────────────────────── */
+.inspiration-section {
+  border-top: 1px solid var(--border);
+  padding: 40px 0 36px;
+  background: var(--white);
+}
+.inspiration-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+.inspiration-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+.inspiration-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.inspiration-tab {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-2);
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition);
+}
+.inspiration-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+/* Horizontal scrollable row — Airbnb style */
+.inspiration-grid {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.inspiration-grid::-webkit-scrollbar { display: none; }
+
+.inspiration-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  padding: 10px 14px 10px 10px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  flex-shrink: 0;
+  width: 200px;
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.inspiration-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.inspiration-img {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-sm);
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.inspiration-info { flex: 1; min-width: 0; }
+.inspiration-city {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.inspiration-label {
+  font-size: 12px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+
+@media (max-width: 768px) {
+  .inspiration-inner { padding: 0 16px; }
+  .inspiration-title { font-size: 17px; }
+  .inspiration-card { width: 160px; }
+  .inspiration-img { width: 48px; height: 48px; }
+}
+@media (max-width: 480px) {
+  .inspiration-card { width: 150px; padding: 8px 10px 8px 8px; }
+}
+
+/* ── Property Card Carousel ──────────────────────────────────────── */
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.carousel-slide.active { opacity: 1; }
+.carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Prev / Next buttons — hidden by default, show on card hover */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.9);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity var(--transition), transform var(--transition);
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  line-height: 1;
+}
+.carousel-btn-prev { left: 8px; }
+.carousel-btn-next { right: 8px; }
+.carousel-btn:hover { transform: translateY(-50%) scale(1.08); }
+
+/* Show buttons on card hover */
+.prop-card:hover .carousel-btn { opacity: 1; }
+
+/* Dots */
+.carousel-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.prop-card:hover .carousel-dots { opacity: 1; }
+
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.6);
+  transition: background var(--transition), transform var(--transition);
+}
+.carousel-dot.active {
+  background: var(--white);
+  transform: scale(1.2);
+}

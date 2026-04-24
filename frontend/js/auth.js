@@ -147,8 +147,8 @@ const Auth = {
     this._on('nav-dropdown-wishlist', () => { window.location.href = root + 'pages/wishlist.html'; });
     this._on('nav-dropdown-host-link',() => { window.location.href = root + 'pages/host.html'; });
     this._on('nav-dropdown-admin',    () => { window.location.href = root + 'pages/admin.html'; });
+    this._on('nav-dropdown-profile',  () => { window.location.href = root + 'pages/profile.html'; });
     this._on('nav-logout',            () => { Auth.logout(); });
-
     this._initDropdownToggle();
   },
 

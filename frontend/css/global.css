@@ -303,3 +303,12 @@ p  { line-height: 1.6; }
     align-items: flex-end !important;
   }
 }
+
+/* ── Page fade-in on load ────────────────────────────────────────── */
+body {
+  animation: pageFadeIn .4s ease forwards;
+}
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -129,6 +129,12 @@ const PropertyPage = {
             ? `★ ${Number(p.avgRating).toFixed(2)} · ${p.totalReviews} reviews`
             : '';
 
+    // Mobile sticky price bar
+    const mobilePrice = document.getElementById('mobile-bar-price');
+    if (mobilePrice) mobilePrice.textContent = Utils.formatCurrency(p.pricePerNight);
+    const mobileBtn = document.getElementById('mobile-reserve-btn');
+    if (mobileBtn) mobileBtn.addEventListener('click', () => this.doReserve());
+
     // Save button
     const saveBtn = document.getElementById('save-btn');
     if (p.wishlisted) saveBtn.innerHTML = '❤ Saved';
@@ -158,6 +164,7 @@ const PropertyPage = {
   /* ── Load Reviews ────────────────────────────────────────────── */
   async loadReviews() {
     const container = document.getElementById('reviews-container');
+    const INITIAL   = 4;
 
     try {
       const [reviewsData, summary] = await Promise.all([
@@ -198,14 +205,14 @@ const PropertyPage = {
         }
       }
 
-      // Review cards — sanitize guest names and comments
       const reviews = reviewsData.content || [];
       if (reviews.length === 0) {
         container.innerHTML =
             '<p class="text-muted">No reviews yet. Be the first to review!</p>';
         return;
       }
-      container.innerHTML = reviews.map(r => `
+
+      const renderReview = r => `
         <div class="review-item">
           <div class="review-header">
             <div class="reviewer-avatar">${Utils.initials(r.guestName)}</div>
@@ -215,8 +222,25 @@ const PropertyPage = {
             </div>
           </div>
           <div class="review-comment">${Utils.esc(r.comment || '')}</div>
-        </div>`
-      ).join('');
+        </div>`;
+
+      // Show first INITIAL reviews
+      const visible  = reviews.slice(0, INITIAL);
+      const hidden   = reviews.slice(INITIAL);
+
+      container.innerHTML = visible.map(renderReview).join('');
+
+      // Add "Show more" button if there are more reviews
+      if (hidden.length > 0) {
+        const btn = document.createElement('button');
+        btn.className   = 'show-more-reviews-btn';
+        btn.textContent = `Show all ${reviews.length} reviews`;
+        btn.addEventListener('click', () => {
+          container.insertAdjacentHTML('beforeend', hidden.map(renderReview).join(''));
+          btn.remove();
+        });
+        container.appendChild(btn);
+      }
 
     } catch (e) {
       console.error('Failed to load reviews:', e.message);
