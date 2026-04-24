@@ -49,12 +49,26 @@
   </div>
 
   <!-- Photo grid -->
-  <div class="photo-grid">
+  <div class="photo-grid" id="photo-grid">
     <div class="photo-main" id="photo-main" style="background:#E2D5C3;font-size:80px">🏠
-      <button class="show-all-btn">Show all photos</button>
+      <button class="show-all-btn" id="show-all-btn">📷 Show all photos</button>
     </div>
     <div class="photo-thumb" id="photo-thumb-1" style="background:#D5E2C3;font-size:44px">🛏</div>
     <div class="photo-thumb" id="photo-thumb-2" style="background:#C3D5E2;font-size:44px">🚿</div>
+  </div>
+
+  <!-- Photo Lightbox -->
+  <div class="lightbox hidden" id="lightbox">
+    <div class="lightbox-overlay" id="lightbox-overlay"></div>
+    <div class="lightbox-content">
+      <button class="lightbox-close" id="lightbox-close">✕</button>
+      <button class="lightbox-nav lightbox-prev" id="lightbox-prev">&#8249;</button>
+      <div class="lightbox-img-wrap">
+        <img class="lightbox-img" id="lightbox-img" src="" alt="">
+      </div>
+      <button class="lightbox-nav lightbox-next" id="lightbox-next">&#8250;</button>
+      <div class="lightbox-counter" id="lightbox-counter"></div>
+    </div>
   </div>
 
   <!-- Detail body -->
