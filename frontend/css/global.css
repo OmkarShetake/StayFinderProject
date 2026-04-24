@@ -278,3 +278,28 @@ p  { line-height: 1.6; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* ── Trip card mobile ────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .trip-card {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .trip-img {
+    width: 100% !important;
+    height: 200px !important;
+  }
+}
+
+/* ── Modal full screen on mobile ─────────────────────────────────── */
+@media (max-width: 480px) {
+  .modal {
+    width: 100% !important;
+    max-width: 100vw !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+    padding: 24px 16px !important;
+  }
+  .modal-overlay {
+    align-items: flex-end !important;
+  }
+}

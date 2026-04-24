@@ -373,3 +373,79 @@
 .cal-day.empty  { cursor: default; }
 
 
+
+/* ── Mobile Responsive ──────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .detail-body {
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-page { padding: 0 16px; }
+
+  .detail-header {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 0 12px;
+  }
+
+  .detail-title { font-size: 20px; }
+
+  .detail-actions { align-self: flex-start; }
+
+  /* Photo grid: single column on mobile */
+  .photo-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 240px;
+  }
+  .photo-main {
+    grid-row: 1;
+    border-radius: var(--radius-md);
+  }
+  /* Hide side thumbnails on mobile */
+  .photo-thumb { display: none; }
+
+  /* Stack the two-column body into single column */
+  .detail-body {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 20px 0 40px;
+  }
+
+  /* Move booking card below content on mobile */
+  .detail-body > div:last-child {
+    order: -1;
+    margin-bottom: 24px;
+  }
+
+  .booking-card {
+    position: static;
+    border-radius: var(--radius-md);
+  }
+
+  /* Rating grid single column */
+  .rating-grid { grid-template-columns: 1fr; }
+
+  /* Amenity grid single column */
+  .amenity-grid { grid-template-columns: 1fr; }
+
+  .detail-host-row { flex-wrap: wrap; gap: 12px; }
+}
+
+@media (max-width: 480px) {
+  .detail-page { padding: 0 12px; }
+
+  .booking-card { padding: 16px; }
+
+  .booking-price-big { font-size: 18px; }
+
+  .date-range-row { grid-template-columns: 1fr; }
+  .date-cell:first-child {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cal-day { font-size: 12px; }
+}
