@@ -13,12 +13,12 @@ const WS = {
         window.location.hostname === '127.0.0.1';
 
     if (isLocal) {
-      // Local development
-      return 'ws://localhost:8080/ws';
+      // SockJS requires http:// not ws://
+      return 'http://localhost:8080/ws';
     }
 
-    // Production (Render backend)
-    return 'wss://stayfinder-backend-5en8.onrender.com/ws';
+    // SockJS requires https:// not wss://
+    return 'https://stayfinder-backend-5en8.onrender.com/ws';
   },
 
   /* ── Connect ─────────────────────────────────────────────────── */
