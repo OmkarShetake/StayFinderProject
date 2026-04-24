@@ -230,6 +230,139 @@
   </div>
 </div>
 
+<!-- ── Footer ───────────────────────────────────────────────────── -->
+<footer class="sf-footer">
+  <div class="sf-footer-top">
+    <div class="sf-footer-col">
+      <div class="sf-footer-col-title">Support</div>
+      <a class="sf-footer-link" href="#">Help Centre</a>
+      <a class="sf-footer-link" href="#">AirCover</a>
+      <a class="sf-footer-link" href="#">Anti-discrimination</a>
+      <a class="sf-footer-link" href="#">Disability support</a>
+      <a class="sf-footer-link" href="#">Cancellation options</a>
+      <a class="sf-footer-link" href="#">Report a concern</a>
+    </div>
+    <div class="sf-footer-col">
+      <div class="sf-footer-col-title">Hosting</div>
+      <a class="sf-footer-link" href="pages/host.html">StayFinder your home</a>
+      <a class="sf-footer-link" href="#">AirCover for hosts</a>
+      <a class="sf-footer-link" href="#">Hosting resources</a>
+      <a class="sf-footer-link" href="#">Community forum</a>
+      <a class="sf-footer-link" href="#">Host responsibly</a>
+      <a class="sf-footer-link" href="#">Find a co-host</a>
+    </div>
+    <div class="sf-footer-col">
+      <div class="sf-footer-col-title">StayFinder</div>
+      <a class="sf-footer-link" href="#">Newsroom</a>
+      <a class="sf-footer-link" href="#">New features</a>
+      <a class="sf-footer-link" href="#">Careers</a>
+      <a class="sf-footer-link" href="#">Investors</a>
+      <a class="sf-footer-link" href="#">Gift cards</a>
+      <a class="sf-footer-link" href="#">Emergency stays</a>
+    </div>
+  </div>
+  <div class="sf-footer-bottom">
+    <div class="sf-footer-copy">© 2026 StayFinder, Inc. · <a href="#">Privacy</a> · <a href="#">Terms</a> · <a href="#">Sitemap</a></div>
+    <div class="sf-footer-social">
+      <a class="sf-footer-social-btn" href="#" title="Facebook">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+      </a>
+      <a class="sf-footer-social-btn" href="#" title="Twitter/X">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+      <a class="sf-footer-social-btn" href="#" title="Instagram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+.sf-footer {
+  border-top: 1px solid var(--border);
+  background: var(--white);
+  margin-top: 40px;
+}
+.sf-footer-top {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 40px 40px;
+}
+.sf-footer-col-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.sf-footer-link {
+  display: block;
+  font-size: 13px;
+  color: var(--text-2);
+  margin-bottom: 12px;
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.sf-footer-link:hover { color: var(--text); text-decoration: underline; }
+.sf-footer-bottom {
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 40px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.sf-footer-copy {
+  font-size: 13px;
+  color: var(--text-2);
+}
+.sf-footer-copy a {
+  color: var(--text-2);
+  text-decoration: underline;
+  margin: 0 4px;
+}
+.sf-footer-copy a:hover { color: var(--text); }
+.sf-footer-social { display: flex; gap: 12px; align-items: center; }
+.sf-footer-social-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  transition: all var(--transition);
+  text-decoration: none;
+}
+.sf-footer-social-btn:hover { border-color: var(--text); background: var(--bg); }
+
+@media (max-width: 768px) {
+  .sf-footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 32px 20px 24px;
+  }
+  .sf-footer-bottom { padding: 16px 20px; }
+}
+@media (max-width: 480px) {
+  .sf-footer-top {
+    grid-template-columns: 1fr;
+    padding: 24px 16px 20px;
+  }
+  .sf-footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+}
+</style>
+
 <!-- Toast -->
 <div id="toast"></div>
 
