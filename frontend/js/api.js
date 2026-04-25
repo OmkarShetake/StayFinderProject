@@ -57,7 +57,9 @@ const API = {
     updateProfile: (body) => API._req('PATCH', '/auth/profile', body),
     forgotPassword: (body) => API._req('POST', '/auth/forgot-password', {
         ...body,
-        frontendUrl: window.location.origin
+        frontendUrl: window.location.origin + (window.location.pathname.includes('/frontend/') 
+            ? window.location.pathname.substring(0, window.location.pathname.indexOf('/frontend/') + '/frontend'.length)
+            : '')
     }, false),
     resetPassword:  (body) => API._req('POST', '/auth/reset-password', body, false),
 
