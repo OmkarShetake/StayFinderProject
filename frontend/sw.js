@@ -1,5 +1,5 @@
 /* ── StayFinder Service Worker ─────────────────────────────────── */
-const CACHE_NAME = 'stayfinder-v1';
+const CACHE_NAME = 'stayfinder-v2';
 
 // Static assets to cache on install
 const STATIC_ASSETS = [
