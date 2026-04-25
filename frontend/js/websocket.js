@@ -51,6 +51,19 @@ const WS = {
                   }
                 }
             );
+
+            // Subscribe to messages queue
+            this.client.subscribe(
+                `/user/${userId}/queue/messages`,
+                msg => {
+                  try {
+                    const message = JSON.parse(msg.body);
+                    this._handleMessage(message);
+                  } catch (e) {
+                    console.warn('WS message parse error:', e.message);
+                  }
+                }
+            );
           },
           err => {
             this.connected = false;
@@ -85,6 +98,20 @@ const WS = {
     if (notification.title) {
       Utils.toast('🔔 ' + notification.title);
     }
+  },
+
+  /* ── Handle incoming message ─────────────────────────────────── */
+  _handleMessage(message) {
+    if (typeof this._msgHandler === 'function') {
+      this._msgHandler(message);
+    } else {
+      Utils.toast('💬 New message from ' + (message.senderName || 'someone'));
+    }
+  },
+
+  /* ── Register message handler ────────────────────────────────── */
+  onMessage(fn) {
+    this._msgHandler = fn;
   },
 
   /* ── Register notification handler ──────────────────────────── */

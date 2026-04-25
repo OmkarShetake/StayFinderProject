@@ -31,6 +31,7 @@ const Search = {
   async init() {
     this._readUrlParams();
     this._bindEvents();
+    this._initInfiniteScroll();
     await this.loadProperties();
     if (Auth.isLoggedIn()) await this._loadWishlist();
     Auth.renderNavUser();
@@ -107,11 +108,25 @@ const Search = {
       });
     });
 
-    // Load more
-    document.getElementById('load-more-btn')?.addEventListener('click', () => {
-      this.currentPage++;
-      this.loadProperties(true);
-    });
+    // Load more — keep hidden, infinite scroll handles it
+    document.getElementById('load-more-btn')?.classList.add('hidden');
+  },
+
+  /* ── Infinite Scroll ─────────────────────────────────────────── */
+  _initInfiniteScroll() {
+    const sentinel = document.createElement('div');
+    sentinel.id = 'scroll-sentinel';
+    sentinel.style.height = '1px';
+    document.getElementById('prop-grid')?.after(sentinel);
+
+    const observer = new IntersectionObserver(async (entries) => {
+      if (entries[0].isIntersecting && !this.loading && this.currentPage < this.totalPages - 1) {
+        this.currentPage++;
+        await this.loadProperties(true);
+      }
+    }, { rootMargin: '200px' });
+
+    observer.observe(sentinel);
   },
 
   /* ── Load Properties ─────────────────────────────────────────── */
@@ -142,7 +157,19 @@ const Search = {
       }
 
       const btn = document.getElementById('load-more-btn');
-      if (btn) btn.classList.toggle('hidden', this.currentPage >= this.totalPages - 1);
+      if (btn) btn.classList.add('hidden');
+
+      // Show/hide bottom loader
+      const sentinel = document.getElementById('scroll-sentinel');
+      if (sentinel) {
+        sentinel.innerHTML = this.currentPage < this.totalPages - 1
+          ? '<div style="text-align:center;padding:24px"><div class="spinner" style="border-color:rgba(0,0,0,.1);border-top-color:var(--text);margin:0 auto"></div></div>'
+          : '';
+      }
+
+      // Animate cards in
+      setTimeout(() => Utils.initScrollReveal(), 50);
+      setTimeout(() => Utils.initImageBlur(), 100);
 
     } catch (e) {
       if (!append) {
@@ -279,6 +306,7 @@ const Search = {
     if (!Auth.isLoggedIn()) { Auth.showAuthModal('login'); return; }
     try {
       await API.toggleWishlist(id);
+      Utils.heartBounce(el);
       if (this.wishlistIds.has(id)) {
         this.wishlistIds.delete(id);
         el.textContent = '🤍';

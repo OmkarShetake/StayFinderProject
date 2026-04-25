@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Trips — StayFinder</title>
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#FF385C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="StayFinder">
   <link rel="stylesheet" href="../css/global.css">
   <link rel="stylesheet" href="../css/nav.css">
   <link rel="stylesheet" href="../css/host.css">
@@ -260,7 +264,8 @@
             <span class="badge ${b.status === 'CONFIRMED' ? 'badge-success' : b.status === 'PENDING' ? 'badge-warning' : b.status === 'COMPLETED' ? 'badge-gray' : 'badge-danger'}">${b.status}</span>
             ${b.status === 'CONFIRMED' || b.status === 'PENDING' ? `
               <button class="btn btn-secondary btn-sm" onclick="Trips.cancel(${b.id})">Cancel</button>
-              <button class="btn btn-outline btn-sm" onclick="Trips.openModify(${b.id}, '${(b.property?.title || '').replace(/'/g, "\\'")}', '${b.checkIn}', '${b.checkOut}', ${b.guests}, ${b.property?.id})">Change dates</button>` : ''}
+              <button class="btn btn-outline btn-sm" onclick="Trips.openModify(${b.id}, '${(b.property?.title || '').replace(/'/g, "\\'")}', '${b.checkIn}', '${b.checkOut}', ${b.guests}, ${b.property?.id})">Change dates</button>
+              <button class="btn btn-outline btn-sm" onclick="window.location.href='chat.html?bookingId=${b.id}'">💬 Message host</button>` : ''}
             ${b.canReview ? `<button class="btn btn-outline btn-sm" onclick="Trips.openReview(${b.id})">Write review</button>` : ''}
           </div>
           <div class="trip-ref mt-8">Ref: ${b.referenceId}</div>

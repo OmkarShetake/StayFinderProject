@@ -5,6 +5,8 @@ import com.stayfinder.dto.AuthDTOs.*;
 import com.stayfinder.entity.RefreshToken;
 import com.stayfinder.entity.User;
 import com.stayfinder.exception.StayFinderException;
+import com.stayfinder.repository.PasswordResetTokenRepository;
+import com.stayfinder.entity.PasswordResetToken;
 import com.stayfinder.repository.RefreshTokenRepository;
 import com.stayfinder.repository.UserRepository;
 
@@ -31,9 +33,11 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authManager;
+    private final EmailService emailService;
 
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
@@ -173,6 +177,77 @@ public class AuthService {
         userRepository.save(user);
         log.info("Profile updated for user {}", user.getEmail());
         return UserResponse.from(user);
+    }
+
+    /* ── Forgot password ─────────────────────────────────────────── */
+    @Transactional
+    public void forgotPassword(String email, String appUrl) {
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) return; // Silent — don't reveal if email exists
+
+        // Delete any existing reset tokens
+        passwordResetTokenRepository.deleteByUserId(user.getId());
+
+        // Generate token
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken prt = PasswordResetToken.builder()
+                .user(user)
+                .token(token)
+                .expiresAt(LocalDateTime.now().plusHours(1))
+                .build();
+        passwordResetTokenRepository.save(prt);
+
+        // Send email
+        String resetLink = appUrl + "/pages/reset-password.html?token=" + token;
+        String html = """
+            <!DOCTYPE html>
+            <html>
+            <head><meta charset="UTF-8"></head>
+            <body style="margin:0;padding:0;background:#f7f7f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+              <table width="100%%" cellpadding="0" cellspacing="0" style="background:#f7f7f7;padding:40px 0">
+                <tr><td align="center">
+                  <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+                    <tr><td style="background:#ff385c;padding:28px 40px">
+                      <span style="color:white;font-size:22px;font-weight:700">stayfinder</span>
+                    </td></tr>
+                    <tr><td style="padding:40px">
+                      <h2 style="margin:0 0 16px;font-size:22px;color:#222">Reset your password</h2>
+                      <p style="color:#717171;font-size:15px;margin-bottom:24px">Hi %s, click the button below to reset your password. This link expires in 1 hour.</p>
+                      <a href="%s" style="display:inline-block;padding:14px 28px;background:#ff385c;color:white;border-radius:8px;font-size:15px;font-weight:700;text-decoration:none">Reset Password</a>
+                      <p style="color:#aaa;font-size:12px;margin-top:24px">If you didn't request this, ignore this email.</p>
+                    </td></tr>
+                  </table>
+                </td></tr>
+              </table>
+            </body>
+            </html>
+            """.formatted(user.getFullName(), resetLink);
+
+        emailService.send(user.getEmail(), "Reset your StayFinder password", html);
+        log.info("Password reset email sent to {}", email);
+    }
+
+    /* ── Reset password ──────────────────────────────────────────── */
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken prt = passwordResetTokenRepository.findByToken(token)
+                .orElseThrow(() -> new StayFinderException("Invalid or expired reset link"));
+
+        if (prt.isExpired()) {
+            passwordResetTokenRepository.delete(prt);
+            throw new StayFinderException("Reset link has expired. Please request a new one.");
+        }
+
+        User user = prt.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Delete used token
+        passwordResetTokenRepository.delete(prt);
+        // Also invalidate all refresh tokens
+        refreshTokenRepository.deleteByUserId(user.getId());
+
+        log.info("Password reset for user {}", user.getEmail());
     }
 
     /* ── Token building ──────────────────────────────────────────── */

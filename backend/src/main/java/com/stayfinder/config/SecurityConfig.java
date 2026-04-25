@@ -48,8 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // Public APIs
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/properties/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()                        .requestMatchers(HttpMethod.GET, "/api/v1/properties/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/reviews/**").permitAll()
 
                         // Swagger (ADD THIS 🔥)

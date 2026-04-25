@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Messages — StayFinder</title>
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#FF385C">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/nav.css">
+  <link rel="stylesheet" href="../css/auth.css">
+  <style>
+    .chat-layout {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 24px 80px;
+      height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .chat-back {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--text);
+      padding: 4px 8px;
+    }
+    .chat-title { font-size: 18px; font-weight: 700; }
+    .chat-subtitle { font-size: 13px; color: var(--text-2); }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 8px 0;
+    }
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 70%;
+    }
+    .chat-msg.mine { align-self: flex-end; align-items: flex-end; }
+    .chat-msg.theirs { align-self: flex-start; align-items: flex-start; }
+    .chat-bubble {
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .chat-msg.mine .chat-bubble {
+      background: var(--text);
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.theirs .chat-bubble {
+      background: var(--bg);
+      color: var(--text);
+      border-bottom-left-radius: 4px;
+    }
+    .chat-time {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+    .chat-sender {
+      font-size: 12px;
+      color: var(--text-2);
+      font-weight: 600;
+      margin-bottom: 4px;
+      padding: 0 4px;
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .chat-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+      resize: none;
+      max-height: 100px;
+      transition: border-color var(--transition);
+    }
+    .chat-input:focus { border-color: var(--text); }
+    .chat-send-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--red);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--transition);
+    }
+    .chat-send-btn:hover { background: var(--red-dark); }
+    .chat-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-2);
+      font-size: 14px;
+    }
+    @media (max-width: 768px) {
+      .chat-layout { padding: 16px 12px 80px; }
+      .chat-msg { max-width: 85%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-logo" id="nav-logo">stayfinder</div>
+  <div class="nav-right">
+    <div class="nav-user" id="nav-user-btn" style="position:relative">
+      <div class="nav-ham">☰</div>
+      <div class="nav-avatar" id="nav-avatar">👤</div>
+      <div class="notif-dot hidden"></div>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <div class="nav-dropdown-user hidden" id="nav-dropdown-user">
+          <div class="nav-dropdown-avatar" id="nav-dropdown-avatar"></div>
+          <div>
+            <div class="nav-dropdown-name" id="nav-dropdown-name"></div>
+            <div class="nav-dropdown-email" id="nav-dropdown-email"></div>
+          </div>
+        </div>
+        <div class="nav-dropdown-section hidden" id="nav-dropdown-guest">
+          <button class="nav-dropdown-item" id="nav-dropdown-login">
+            <span class="nav-dropdown-item-icon">🔑</span> Log in
+          </button>
+        </div>
+        <div class="nav-dropdown-section hidden" id="nav-dropdown-auth">
+          <button class="nav-dropdown-item" id="nav-dropdown-trips">
+            <span class="nav-dropdown-item-icon">🧳</span> My trips
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-wishlist">
+            <span class="nav-dropdown-item-icon">❤️</span> Wishlists
+          </button>
+          <button class="nav-dropdown-item" id="nav-dropdown-host-link">
+            <span class="nav-dropdown-item-icon">🏠</span> Host dashboard
+          </button>
+        </div>
+        <div class="hidden" id="nav-dropdown-logout-wrap">
+          <button class="nav-dropdown-logout" id="nav-logout">
+            <span class="nav-dropdown-logout-icon">👋</span> Log out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="chat-layout">
+  <div class="chat-header">
+    <button class="chat-back" id="chat-back">←</button>
+    <div>
+      <div class="chat-title" id="chat-title">Loading...</div>
+      <div class="chat-subtitle" id="chat-subtitle"></div>
+    </div>
+  </div>
+
+  <div class="chat-messages" id="chat-messages">
+    <div class="chat-empty">Loading messages...</div>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chat-input" placeholder="Type a message..." rows="1"></textarea>
+    <button class="chat-send-btn" id="chat-send-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/websocket.js"></script>
+<script>
+  function _rootPath() {
+    const path = window.location.pathname;
+    const idx  = path.indexOf('/frontend/');
+    if (idx !== -1) return path.substring(0, idx + '/frontend/'.length);
+    if (path.includes('/pages/')) return path.substring(0, path.indexOf('/pages/') + 1);
+    return '/';
+  }
+
+  const Chat = {
+    bookingId: null,
+    currentUserId: null,
+    messages: [],
+
+    async init() {
+      if (!Auth.require()) return;
+      Auth.renderNavUser();
+
+      const params = new URLSearchParams(window.location.search);
+      this.bookingId = params.get('bookingId');
+      if (!this.bookingId) { window.location.href = _rootPath() + 'pages/trips.html'; return; }
+
+      this.currentUserId = Auth.getUser()?.id;
+
+      document.getElementById('nav-logo').addEventListener('click', () => {
+        window.location.href = _rootPath() + 'index.html';
+      });
+      document.getElementById('chat-back').addEventListener('click', () => history.back());
+
+      // Send on button click
+      document.getElementById('chat-send-btn').addEventListener('click', () => this.send());
+
+      // Send on Enter (Shift+Enter for newline)
+      document.getElementById('chat-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); }
+      });
+
+      // Auto-resize textarea
+      document.getElementById('chat-input').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+      });
+
+      await this.loadMessages();
+
+      // Listen for real-time messages
+      WS.connect();
+      WS.onNotification(n => {
+        if (n.bookingId == this.bookingId) this.loadMessages();
+      });
+
+      // Subscribe to message queue
+      if (WS.client && WS.connected) {
+        WS.client.subscribe(`/user/${this.currentUserId}/queue/messages`, msg => {
+          try {
+            const m = JSON.parse(msg.body);
+            if (m.bookingId == this.bookingId) this.loadMessages();
+          } catch {}
+        });
+      }
+    },
+
+    async loadMessages() {
+      try {
+        const msgs = await API.getMessages(this.bookingId);
+        this.messages = msgs;
+        this.renderMessages();
+
+        // Set header — find the other person's name
+        const titleEl = document.getElementById('chat-title');
+        const other = msgs.find(m => m.senderId != this.currentUserId);
+        if (other) {
+          titleEl.textContent = other.senderName;
+        } else if (msgs.length > 0) {
+          // All messages are mine — show receiver name from first message
+          titleEl.textContent = msgs[0].receiverName || 'Your host';
+        } else {
+          titleEl.textContent = 'New conversation';
+        }
+        document.getElementById('chat-subtitle').textContent = `Booking #${this.bookingId}`;
+      } catch (e) {
+        document.getElementById('chat-messages').innerHTML =
+          '<div class="chat-empty">Could not load messages.</div>';
+      }
+    },
+
+    renderMessages() {
+      const container = document.getElementById('chat-messages');
+      if (!this.messages.length) {
+        container.innerHTML = '<div class="chat-empty">No messages yet. Say hello! 👋</div>';
+        return;
+      }
+
+      container.innerHTML = this.messages.map(m => {
+        const isMine = m.senderId == this.currentUserId;
+        const time   = new Date(m.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        return `
+          <div class="chat-msg ${isMine ? 'mine' : 'theirs'}">
+            ${!isMine ? `<div class="chat-sender">${Utils.esc(m.senderName)}</div>` : ''}
+            <div class="chat-bubble">${Utils.esc(m.content)}</div>
+            <div class="chat-time">${time}</div>
+          </div>`;
+      }).join('');
+
+      // Scroll to bottom
+      container.scrollTop = container.scrollHeight;
+    },
+
+    async send() {
+      const input   = document.getElementById('chat-input');
+      const content = input.value.trim();
+      if (!content) return;
+
+      const btn = document.getElementById('chat-send-btn');
+      btn.disabled = true;
+
+      try {
+        await API.sendMessage({ bookingId: parseInt(this.bookingId), content });
+        input.value = '';
+        input.style.height = 'auto';
+        await this.loadMessages();
+      } catch (e) {
+        Utils.toast('Failed to send: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        input.focus();
+      }
+    },
+  };
+
+  document.addEventListener('DOMContentLoaded', () => Chat.init());
+</script>
+</body>
+</html>

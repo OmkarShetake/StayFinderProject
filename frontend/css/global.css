@@ -319,3 +319,52 @@ body {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ── 1. Scroll reveal ────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── 2. Heart bounce animation ───────────────────────────────────── */
+@keyframes heartBounce {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.4); }
+  60%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+.heart-bounce { animation: heartBounce .4s ease forwards; }
+
+/* ── 3. Blur-to-sharp image loading ──────────────────────────────── */
+.img-blur {
+  filter: blur(8px);
+  transition: filter .4s ease;
+}
+.img-blur.loaded { filter: blur(0); }
+
+/* ── 4. Top loading progress bar ────────────────────────────────── */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #ff385c, #e31c5f);
+  z-index: 9999;
+  transition: width .3s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* ── 5. Button press effect ──────────────────────────────────────── */
+.btn:active,
+.reserve-btn:active,
+.filter-apply-btn:active,
+.ns-btn:active {
+  transform: scale(0.97);
+  transition: transform .1s ease;
+}

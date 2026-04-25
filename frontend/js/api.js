@@ -25,24 +25,25 @@ const API = {
     async _req(method, path, body = null, auth = true) {
         const opts = { method, headers: this._headers(auth) };
         if (body) opts.body = JSON.stringify(body);
+        Utils.progressStart?.();
         let res = await fetch(this.BASE + path, opts);
 
         // If unauthorized and we have a refresh token, try refreshing once
         if (res.status === 401 && auth && Auth.getRefresh()) {
             const refreshed = await Auth.refreshToken();
             if (refreshed) {
-                // Retry original request with new token
                 opts.headers = this._headers(auth);
                 res = await fetch(this.BASE + path, opts);
             } else {
-                // Refresh failed — force logout
                 Auth.clear();
                 window.location.href = '/?login=1';
+                Utils.progressDone?.();
                 return;
             }
         }
 
         const data = await res.json().catch(() => ({}));
+        Utils.progressDone?.();
         if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
         return data;
     },
@@ -54,6 +55,11 @@ const API = {
     me:       ()      => API._req('GET',  '/auth/me'),
     becomeHost: ()    => API._req('POST', '/auth/become-host'),
     updateProfile: (body) => API._req('PATCH', '/auth/profile', body),
+    forgotPassword: (body) => API._req('POST', '/auth/forgot-password', {
+        ...body,
+        frontendUrl: window.location.origin
+    }, false),
+    resetPassword:  (body) => API._req('POST', '/auth/reset-password', body, false),
 
     /* ── Properties ─────────────────────────────────────────────── */
     searchProperties: (params) =>
@@ -90,6 +96,11 @@ const API = {
     getNotifications:   () => API._req('GET', '/notifications'),
     getUnreadCount:     () => API._req('GET', '/notifications/unread/count'),
     markAllRead:        () => API._req('PATCH', '/notifications/mark-all-read'),
+
+    /* ── Messages ───────────────────────────────────────────────── */
+    sendMessage:      (body)       => API._req('POST', '/messages', body),
+    getMessages:      (bookingId)  => API._req('GET', `/messages/booking/${bookingId}`),
+    getUnreadMessages:()           => API._req('GET', '/messages/unread/count'),
 
     /* ── Admin ──────────────────────────────────────────────────── */
     adminGetProperties:   (status = 'PENDING', p = 0) =>

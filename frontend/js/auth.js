@@ -6,23 +6,23 @@ const Auth = {
   REFRESH_KEY: 'sf_refresh',
   USER_KEY:    'sf_user',
 
-  getToken()   { return localStorage.getItem(this.TOKEN_KEY); },
-  getRefresh() { return localStorage.getItem(this.REFRESH_KEY); },
-  getUser()    { return JSON.parse(localStorage.getItem(this.USER_KEY) || 'null'); },
+  getToken()   { return sessionStorage.getItem(this.TOKEN_KEY); },
+  getRefresh() { return sessionStorage.getItem(this.REFRESH_KEY); },
+  getUser()    { return JSON.parse(sessionStorage.getItem(this.USER_KEY) || 'null'); },
   isLoggedIn() { return !!this.getToken(); },
   isHost()     { return this.getUser()?.host === true; },
   isAdmin()    { return this.getUser()?.role === 'ADMIN'; },
 
   save(data) {
-    localStorage.setItem(this.TOKEN_KEY,   data.accessToken);
-    localStorage.setItem(this.REFRESH_KEY, data.refreshToken);
-    localStorage.setItem(this.USER_KEY,    JSON.stringify(data.user));
+    sessionStorage.setItem(this.TOKEN_KEY,   data.accessToken);
+    sessionStorage.setItem(this.REFRESH_KEY, data.refreshToken);
+    sessionStorage.setItem(this.USER_KEY,    JSON.stringify(data.user));
   },
 
   clear() {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_KEY);
-    localStorage.removeItem(this.USER_KEY);
+    sessionStorage.removeItem(this.TOKEN_KEY);
+    sessionStorage.removeItem(this.REFRESH_KEY);
+    sessionStorage.removeItem(this.USER_KEY);
   },
 
   _rootPath() {
@@ -197,7 +197,7 @@ const Auth = {
       try {
         await API.becomeHost();
         const userData = await API.me();
-        localStorage.setItem(Auth.USER_KEY, JSON.stringify(userData));
+        sessionStorage.setItem(Auth.USER_KEY, JSON.stringify(userData));
         Utils.toast('Welcome to hosting! 🏠');
         setTimeout(() => window.location.href = Auth._rootPath() + 'pages/host.html', 1000);
       } catch (e) {

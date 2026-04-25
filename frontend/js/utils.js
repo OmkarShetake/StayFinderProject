@@ -108,6 +108,62 @@ const Utils = {
   },
 
   /* ── Modals ──────────────────────────────────────────────────── */
+  /* ── Progress Bar ────────────────────────────────────────────── */
+  progressStart() {
+    let bar = document.getElementById('progress-bar');
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.id = 'progress-bar';
+      document.body.prepend(bar);
+    }
+    bar.style.width = '0%';
+    bar.style.opacity = '1';
+    // Animate to 80% quickly then wait
+    setTimeout(() => { bar.style.width = '80%'; }, 10);
+  },
+
+  progressDone() {
+    const bar = document.getElementById('progress-bar');
+    if (!bar) return;
+    bar.style.width = '100%';
+    setTimeout(() => { bar.style.opacity = '0'; bar.style.width = '0%'; }, 400);
+  },
+
+  /* ── Scroll Reveal ───────────────────────────────────────────── */
+  initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.prop-card, .stat-card, .booking-row, .listing-card, .trip-card')
+      .forEach((el, i) => {
+        el.classList.add('reveal');
+        el.style.transitionDelay = `${(i % 4) * 60}ms`;
+        observer.observe(el);
+      });
+  },
+
+  /* ── Blur-to-sharp image loading ─────────────────────────────── */
+  initImageBlur() {
+    document.querySelectorAll('img').forEach(img => {
+      if (img.complete) return;
+      img.classList.add('img-blur');
+      img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+    });
+  },
+
+  /* ── Heart bounce ────────────────────────────────────────────── */
+  heartBounce(el) {
+    el.classList.remove('heart-bounce');
+    void el.offsetWidth; // reflow
+    el.classList.add('heart-bounce');
+  },
+
   showModal(id) {
     document.getElementById(id)?.classList.remove('hidden');
     document.body.style.overflow = 'hidden';

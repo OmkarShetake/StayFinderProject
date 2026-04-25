@@ -40,6 +40,21 @@ public class AuthDTOs {
     }
 
     @Data
+    public static class ForgotPasswordRequest {
+        @NotBlank @Email
+        private String email;
+        private String frontendUrl;
+    }
+
+    @Data
+    public static class ResetPasswordRequest {
+        @NotBlank
+        private String token;
+        @NotBlank @Size(min = 8)
+        private String newPassword;
+    }
+
+    @Data
     public static class TokenResponse {
         private String accessToken;
         private String refreshToken;

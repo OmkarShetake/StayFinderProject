@@ -351,13 +351,19 @@ const HostDashboard = {
             <button class="booking-row-btn decline" onclick="HostDashboard.decline(${b.id})">
               Decline
             </button>
+            <button class="booking-row-btn decline" onclick="window.location.href='chat.html?bookingId=${b.id}'" style="background:none;border:1px solid var(--border)">
+              💬
+            </button>
           </div>` : `
-          <span class="badge ${
-            b.status === 'CONFIRMED'                             ? 'badge-success' :
-                b.status === 'PENDING'                               ? 'badge-warning' :
-                    b.status === 'CANCELLED' || b.status === 'REJECTED' ? 'badge-danger'  :
-                        'badge-gray'
-        }">${Utils.esc(b.status)}</span>`
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge ${
+              b.status === 'CONFIRMED'                             ? 'badge-success' :
+                  b.status === 'PENDING'                               ? 'badge-warning' :
+                      b.status === 'CANCELLED' || b.status === 'REJECTED' ? 'badge-danger'  :
+                          'badge-gray'
+          }">${Utils.esc(b.status)}</span>
+            ${b.status === 'CONFIRMED' ? `<button onclick="window.location.href='chat.html?bookingId=${b.id}'" style="background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:13px">💬</button>` : ''}
+          </div>`
         }
       </div>`
     ).join('');
@@ -454,6 +460,25 @@ const HostDashboard = {
     btn.disabled    = true;
     btn.textContent = 'Creating...';
 
+    // City → coordinates lookup
+    const CITY_COORDS = {
+      'mumbai': [19.0760, 72.8777], 'goa': [15.2993, 74.1240],
+      'manali': [32.2396, 77.1887], 'jaipur': [26.9124, 75.7873],
+      'udaipur': [24.5854, 73.6836], 'bangalore': [12.9716, 77.5946],
+      'bengaluru': [12.9716, 77.5946], 'shimla': [31.1048, 77.1734],
+      'rishikesh': [30.0869, 78.2676], 'new delhi': [28.6139, 77.2090],
+      'delhi': [28.6139, 77.2090], 'pune': [18.5204, 73.8567],
+      'hyderabad': [17.3850, 78.4867], 'coorg': [12.3375, 75.8069],
+      'srinagar': [34.0837, 74.7973], 'alappuzha': [9.4981, 76.3388],
+      'wayanad': [11.6854, 76.1320], 'jodhpur': [26.2389, 73.0243],
+      'mysore': [12.2958, 76.6394], 'nashik': [19.9975, 73.7898],
+      'bhuj': [23.2420, 69.6669], 'pondicherry': [11.9416, 79.8083],
+      'kolkata': [22.5726, 88.3639], 'chennai': [13.0827, 80.2707],
+      'ahmedabad': [23.0225, 72.5714], 'kochi': [9.9312, 76.2673],
+      'thiruvananthapuram': [8.5241, 76.9366], 'canacona': [15.0100, 74.0232],
+      'banjar': [31.6340, 77.3590], 'kaza': [32.2273, 78.0718],
+    };
+
     try {
       if (!this.uploadedImageUrls.length) {
         Utils.toast('Please upload at least one photo');
@@ -464,13 +489,16 @@ const HostDashboard = {
         ...document.querySelectorAll('#al-amenities-grid input[type=checkbox]:checked')
       ].map(cb => cb.value);
 
+      const cityVal = document.getElementById('al-city').value.trim();
+      const coords  = CITY_COORDS[cityVal.toLowerCase()] || null;
+
       const body = {
         title:         document.getElementById('al-title').value.trim(),
         description:   document.getElementById('al-description').value.trim(),
         propertyType:  document.getElementById('al-type').value,
         category:      document.getElementById('al-category').value,
         address:       document.getElementById('al-address').value.trim(),
-        city:          document.getElementById('al-city').value.trim(),
+        city:          cityVal,
         state:         document.getElementById('al-state').value.trim(),
         country:       'India',
         pricePerNight: Number(document.getElementById('al-price').value),
@@ -482,6 +510,8 @@ const HostDashboard = {
         instantBook:   document.getElementById('al-instant').checked,
         amenities:     amenities.length ? amenities : undefined,
         imageUrls:     this.uploadedImageUrls,
+        latitude:      coords ? coords[0] : null,
+        longitude:     coords ? coords[1] : null,
       };
 
       await API.createProperty(body);

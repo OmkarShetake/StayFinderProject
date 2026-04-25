@@ -67,6 +67,8 @@ public class PropertyDTOs {
         private List<String> images;
         private boolean wishlisted;
         private LocalDateTime createdAt;
+        private BigDecimal latitude;
+        private BigDecimal longitude;
 
         public static PropertyResponse from(Property p) {
             return from(p, false);
@@ -102,6 +104,8 @@ public class PropertyDTOs {
                     .collect(Collectors.toList());
             r.wishlisted = wishlisted;
             r.createdAt = p.getCreatedAt();
+            r.latitude = p.getLatitude();
+            r.longitude = p.getLongitude();
             return r;
         }
     }
