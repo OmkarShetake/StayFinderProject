@@ -15,8 +15,8 @@ public class PropertyDTOs {
 
     @Data
     public static class CreatePropertyRequest {
-        @NotBlank private String title;
-        private String description;
+        @NotBlank @Size(min = 5, max = 100) private String title;
+        @Size(max = 2000) private String description;
         @NotBlank private String propertyType;
         private String category = "CITY";
         @NotBlank private String address;
@@ -26,16 +26,17 @@ public class PropertyDTOs {
         private String zipCode;
         private BigDecimal latitude;
         private BigDecimal longitude;
-        @NotNull @DecimalMin("100") private BigDecimal pricePerNight;
-        private BigDecimal weekendPrice;
-        private BigDecimal cleaningFee = BigDecimal.valueOf(800);
-        private BigDecimal longStayDiscount = BigDecimal.ZERO;
+        @NotNull @DecimalMin("100") @DecimalMax("1000000") private BigDecimal pricePerNight;
+        @DecimalMin("0") private BigDecimal weekendPrice;
+        @DecimalMin("0") private BigDecimal cleaningFee = BigDecimal.valueOf(800);
+        @DecimalMin("0") @DecimalMax("50") private BigDecimal longStayDiscount = BigDecimal.ZERO;
         @Min(1) @Max(16) private int maxGuests = 1;
-        @Min(1) private int bedrooms = 1;
-        @Min(1) private int bathrooms = 1;
-        @Min(1) private int beds = 1;
+        @Min(1) @Max(20) private int bedrooms = 1;
+        @Min(1) @Max(20) private int bathrooms = 1;
+        @Min(1) @Max(30) private int beds = 1;
         private boolean instantBook = true;
         private Set<String> amenities;
+        @NotNull @Size(min = 1, max = 5, message = "At least 1 and at most 5 images required")
         private List<String> imageUrls;
     }
 

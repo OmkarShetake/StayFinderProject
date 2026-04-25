@@ -45,6 +45,7 @@
   <div class="nav-right">
     <button class="nav-link" id="nav-host-btn">Airbnb your home</button>
     <button class="nav-link hidden" id="nav-login-btn">Log in</button>
+    <button id="dark-mode-btn" title="Toggle dark mode">🌙</button>
 
     <!-- User menu trigger -->
     <div class="nav-user" id="nav-user-btn" style="position:relative">
@@ -546,6 +547,16 @@
       const idx = path.indexOf(marker);
       const root = idx !== -1 ? path.substring(0, idx + marker.length) : path.replace(/\/[^/]*$/, '/');
       window.location.href = root + 'index.html';
+    });
+
+    // Dark mode
+    const darkBtn = document.getElementById('dark-mode-btn');
+    const isDark  = localStorage.getItem('sf_dark') === 'true';
+    if (isDark) { document.body.classList.add('dark'); darkBtn.textContent = '☀️'; }
+    darkBtn?.addEventListener('click', () => {
+      const dark = document.body.classList.toggle('dark');
+      localStorage.setItem('sf_dark', dark);
+      darkBtn.textContent = dark ? '☀️' : '🌙';
     });
 
     // Show login form by default

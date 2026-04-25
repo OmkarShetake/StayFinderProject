@@ -1,6 +1,16 @@
 /* ── StayFinder Utils ──────────────────────────────────────────── */
 'use strict';
 
+// Apply dark mode immediately on page load (before DOM ready)
+if (localStorage.getItem('sf_dark') === 'true') {
+  document.documentElement.classList.add('dark');
+  document.addEventListener('DOMContentLoaded', () => {
+    document.body.classList.add('dark');
+    const btn = document.getElementById('dark-mode-btn');
+    if (btn) btn.textContent = '☀️';
+  });
+}
+
 const Utils = {
 
   /* ── XSS Sanitization ────────────────────────────────────────── */

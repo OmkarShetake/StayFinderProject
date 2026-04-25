@@ -75,10 +75,20 @@ management:
     web:
       exposure:
         include: health,info
+
+# ── SpringDoc / Swagger ──────────────────────────────────────────────
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+  api-docs:
+    path: /v3/api-docs
 # ── Logging ─────────────────────────────────────────────────────────
 logging:
   level:
-    com.stayfinder:              DEBUG
-    org.springframework.security: INFO
-    org.springframework.web.socket: INFO
+    com.stayfinder:              INFO
+    org.springframework.security: WARN
+    org.springframework.web.socket: WARN
     org.springframework.mail:    WARN
+  pattern:
+    console: "%clr(%d{HH:mm:ss.SSS}){faint} %clr([%thread]){magenta} %clr(%-5level){highlight} %clr(%logger{36}){cyan} %clr([%X{requestId}]){yellow} - %msg%n"
