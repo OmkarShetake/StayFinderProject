@@ -207,12 +207,16 @@ p  { line-height: 1.6; }
 /* ── Modal backdrop ──────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0,0,0,.5);
-  z-index: 1000;
+  z-index: 2000;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-y: auto;
 }
 .modal {
   background: var(--white);
@@ -220,8 +224,11 @@ p  { line-height: 1.6; }
   padding: 32px;
   width: 480px;
   max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: var(--shadow-xl);
   position: relative;
+  margin: auto;
 }
 .modal-close {
   position: absolute;
@@ -309,6 +316,6 @@ body {
   animation: pageFadeIn .4s ease forwards;
 }
 @keyframes pageFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }

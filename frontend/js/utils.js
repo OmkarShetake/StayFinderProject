@@ -111,11 +111,13 @@ const Utils = {
   showModal(id) {
     document.getElementById(id)?.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
   },
 
   hideModal(id) {
     document.getElementById(id)?.classList.add('hidden');
     document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
   },
 
   onClickOutside(el, fn) {
