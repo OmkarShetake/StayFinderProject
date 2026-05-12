@@ -18,6 +18,7 @@
 
 <!-- ── Navbar ─────────────────────────────────────────────────────── -->
 <nav class="navbar">
+  <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
   <div class="nav-logo" id="nav-logo">stayfinder</div>
 
   <div class="nav-search" id="nav-search-bar">
@@ -538,6 +539,23 @@
     // Register service worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+
+    // Back button for PWA mode
+    const backBtn = document.getElementById('nav-back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        if (window.history.length > 1) {
+          window.history.back();
+        } else {
+          // If no history, go to home
+          const path = window.location.pathname;
+          const marker = '/frontend/';
+          const idx = path.indexOf(marker);
+          const root = idx !== -1 ? path.substring(0, idx + marker.length) : path.replace(/\/[^/]*$/, '/');
+          window.location.href = root + 'index.html';
+        }
+      });
     }
 
     // Fix nav logo path

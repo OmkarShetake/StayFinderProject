@@ -17,6 +17,7 @@
 
 <!-- Navbar -->
 <nav class="navbar">
+  <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
   <div class="nav-logo" id="nav-logo">stayfinder</div>
   <div class="nav-right">
     <button class="nav-link hidden" id="nav-login-btn">Log in</button>
@@ -264,6 +265,19 @@
 <script src="../js/property.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    // Back button for PWA mode
+    document.getElementById('nav-back-btn')?.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        const path = window.location.pathname;
+        const marker = '/frontend/';
+        const idx = path.indexOf(marker);
+        const root = idx !== -1 ? path.substring(0, idx + marker.length) : path.replace(/\/[^/]*$/, '/');
+        window.location.href = root + 'index.html';
+      }
+    });
+
     // Fix nav logo — use dynamic root path same as auth.js
     document.getElementById('nav-logo').addEventListener('click', () => {
       const path = window.location.pathname;

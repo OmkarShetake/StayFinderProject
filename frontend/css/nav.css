@@ -12,6 +12,35 @@
   z-index: 99;
 }
 
+/* Back button for PWA mode */
+.nav-back-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text);
+  cursor: pointer;
+  padding: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  transition: background var(--transition);
+  flex-shrink: 0;
+  line-height: 1;
+}
+.nav-back-btn:hover {
+  background: var(--bg);
+}
+.nav-back-btn:active {
+  background: var(--border);
+}
+
+/* Show back button in standalone PWA mode */
+@media (display-mode: standalone) {
+  .nav-back-btn {
+    display: block;
+  }
+}
+
 /* Logo */
 .nav-logo {
   font-size: 24px;

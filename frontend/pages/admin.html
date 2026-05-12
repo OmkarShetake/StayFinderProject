@@ -13,6 +13,7 @@
 
 <!-- Navbar -->
 <nav class="navbar">
+    <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
     <div class="nav-logo" id="nav-logo">stayfinder</div>
     <div class="nav-right">
         <button class="nav-link" id="btn-explore">Explore</button>
@@ -130,6 +131,15 @@
                 setTimeout(() => window.location.href = _rootPath() + 'index.html', 1500);
                 return;
             }
+
+            // Back button for PWA mode
+            document.getElementById('nav-back-btn')?.addEventListener('click', () => {
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = _rootPath() + 'index.html';
+                }
+            });
 
             document.getElementById('nav-logo').addEventListener('click', () => {
                 window.location.href = _rootPath() + 'index.html';
