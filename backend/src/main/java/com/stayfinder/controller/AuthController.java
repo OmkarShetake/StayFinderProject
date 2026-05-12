@@ -74,5 +74,18 @@ public class AuthController {
         authService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok(Map.of("message", "Password reset successfully. Please log in."));
     }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<Map<String, String>> verifyEmail(@RequestParam String token) {
+        authService.verifyEmail(token);
+        return ResponseEntity.ok(Map.of("message", "Email verified successfully! You can now use all features."));
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<Map<String, String>> resendVerification(
+            @RequestParam String email) {
+        authService.resendVerificationEmail(email);
+        return ResponseEntity.ok(Map.of("message", "Verification email sent. Please check your inbox."));
+    }
     
 }

@@ -45,6 +45,35 @@ public class EmailService {
         }
     }
 
+    /* ── Email Verification ──────────────────────────────────────── */
+    public void sendVerificationEmail(String to, String fullName, String verificationUrl) {
+        String subject = "Verify your email — StayFinder";
+        String body    = baseTemplate(
+            "Welcome to StayFinder! 🏠",
+            fullName,
+            """
+            <p>Thanks for signing up! Please verify your email address to get started.</p>
+            <div style="text-align:center;margin:32px 0">
+              <a href="%s" 
+                 style="display:inline-block;background:#ff385c;color:white;
+                        padding:14px 32px;border-radius:8px;text-decoration:none;
+                        font-weight:600;font-size:15px">
+                Verify Email Address
+              </a>
+            </div>
+            <p style="font-size:13px;color:#717171">
+              This link will expire in 24 hours. If you didn't create an account, 
+              you can safely ignore this email.
+            </p>
+            <p style="font-size:12px;color:#aaa;margin-top:20px">
+              Or copy and paste this link: <br>
+              <span style="word-break:break-all">%s</span>
+            </p>
+            """.formatted(verificationUrl, verificationUrl)
+        );
+        send(to, subject, body);
+    }
+
     /* ── Booking Confirmed ───────────────────────────────────────── */
     public void sendBookingConfirmed(String to, String guestName,
                                      String propertyTitle, String city,

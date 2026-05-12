@@ -41,6 +41,61 @@
   }
 }
 
+/* Email Verification Banner */
+.verification-banner {
+  background: linear-gradient(135deg, #ff385c, #e31c5f);
+  color: white;
+  padding: 12px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(255, 56, 92, 0.2);
+  position: sticky;
+  top: 80px;
+  z-index: 98;
+}
+.verification-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+.verification-icon {
+  font-size: 20px;
+}
+.verification-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+.verification-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.verification-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.verification-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0 8px;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.verification-close:hover {
+  opacity: 1;
+}
+
 /* Logo */
 .nav-logo {
   font-size: 24px;

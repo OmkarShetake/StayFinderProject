@@ -42,6 +42,9 @@ public class AuthService {
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
+    @Value("${stayfinder.frontend-url}")
+    private String frontendUrl;
+
     /* ── Create default users on startup (runs ONCE only) ───────── */
     @PostConstruct
     public void createDefaultUsers() {
@@ -87,6 +90,7 @@ public class AuthService {
                     .phone(phone)
                     .role(role)
                     .enabled(true)
+                    .emailVerified(true)  // Default users are pre-verified
                     .host(isHost)
                     .build();
             userRepository.save(user);
@@ -100,6 +104,10 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new StayFinderException("Email already registered");
         }
+
+        // Generate verification token
+        String verificationToken = UUID.randomUUID().toString();
+
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -107,10 +115,18 @@ public class AuthService {
                 .phone(request.getPhone())
                 .role(User.Role.GUEST)
                 .enabled(true)
+                .emailVerified(false)  // Not verified yet
+                .verificationToken(verificationToken)
+                .verificationTokenExpiry(LocalDateTime.now().plusHours(24))
                 .host(false)
                 .build();
         userRepository.save(user);
-        log.info("New user registered: {}", user.getEmail());
+
+        // Send verification email
+        String verificationUrl = frontendUrl + "/pages/verify-email.html?token=" + verificationToken;
+        emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationUrl);
+
+        log.info("New user registered (unverified): {}", user.getEmail());
         return buildTokenResponse(user);
     }
 
@@ -248,6 +264,48 @@ public class AuthService {
         refreshTokenRepository.deleteByUserId(user.getId());
 
         log.info("Password reset for user {}", user.getEmail());
+    }
+
+    /* ── Verify email ────────────────────────────────────────────── */
+    @Transactional
+    public void verifyEmail(String token) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new StayFinderException("Invalid or expired verification link"));
+
+        if (user.getVerificationTokenExpiry() == null || 
+            user.getVerificationTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new StayFinderException("Verification link has expired. Please request a new one.");
+        }
+
+        user.setEmailVerified(true);
+        user.setVerificationToken(null);
+        user.setVerificationTokenExpiry(null);
+        userRepository.save(user);
+
+        log.info("Email verified for user {}", user.getEmail());
+    }
+
+    /* ── Resend verification email ───────────────────────────────── */
+    @Transactional
+    public void resendVerificationEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new StayFinderException("User not found"));
+
+        if (user.isEmailVerified()) {
+            throw new StayFinderException("Email is already verified");
+        }
+
+        // Generate new token
+        String verificationToken = UUID.randomUUID().toString();
+        user.setVerificationToken(verificationToken);
+        user.setVerificationTokenExpiry(LocalDateTime.now().plusHours(24));
+        userRepository.save(user);
+
+        // Send verification email
+        String verificationUrl = frontendUrl + "/pages/verify-email.html?token=" + verificationToken;
+        emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), verificationUrl);
+
+        log.info("Verification email resent to {}", email);
     }
 
     /* ── Token building ──────────────────────────────────────────── */

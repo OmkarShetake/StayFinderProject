@@ -121,6 +121,18 @@
   </div>
 </nav>
 
+<!-- ── Email Verification Banner ──────────────────────────────────── -->
+<div class="verification-banner hidden" id="verification-banner">
+  <div class="verification-content">
+    <span class="verification-icon">📧</span>
+    <span class="verification-text">
+      Please verify your email address to access all features.
+    </span>
+    <button class="verification-btn" id="resend-verification-btn">Resend email</button>
+  </div>
+  <button class="verification-close" id="close-verification-banner">×</button>
+</div>
+
 <!-- ── Category bar ────────────────────────────────────────────────── -->
 <div class="cat-bar">
   <div class="cat-item active" data-category="">
@@ -579,6 +591,37 @@
 
     // Show login form by default
     document.getElementById('login-form')?.classList.remove('hidden');
+
+    // ── Email Verification Banner ────────────────────────────────
+    const user = Auth.getUser();
+    if (user && !user.emailVerified) {
+      const banner = document.getElementById('verification-banner');
+      banner?.classList.remove('hidden');
+
+      // Resend verification email
+      document.getElementById('resend-verification-btn')?.addEventListener('click', async () => {
+        try {
+          const response = await fetch(
+            API.BASE + '/auth/resend-verification?email=' + encodeURIComponent(user.email),
+            { method: 'POST' }
+          );
+          const data = await response.json();
+          
+          if (response.ok) {
+            Utils.toast('Verification email sent! Check your inbox.');
+          } else {
+            Utils.toast(data.message || 'Failed to resend email');
+          }
+        } catch (error) {
+          Utils.toast('Network error. Please try again.');
+        }
+      });
+
+      // Close banner
+      document.getElementById('close-verification-banner')?.addEventListener('click', () => {
+        banner.classList.add('hidden');
+      });
+    }
 
     // ── City Autocomplete ─────────────────────────────────────────
     const CITIES = [

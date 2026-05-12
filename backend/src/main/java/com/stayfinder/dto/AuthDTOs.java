@@ -81,6 +81,7 @@ public class AuthDTOs {
         private User.Role role;
         private boolean host;
         private boolean superhost;
+        private boolean emailVerified;
 
         public static UserResponse from(User u) {
             UserResponse r = new UserResponse();
@@ -92,6 +93,7 @@ public class AuthDTOs {
             r.role = u.getRole();
             r.host = u.isHost();
             r.superhost = u.isSuperhost();
+            r.emailVerified = u.isEmailVerified();
             return r;
         }
     }
