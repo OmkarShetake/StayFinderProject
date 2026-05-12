@@ -553,22 +553,8 @@
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
 
-    // Back button for PWA mode
-    const backBtn = document.getElementById('nav-back-btn');
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        if (window.history.length > 1) {
-          window.history.back();
-        } else {
-          // If no history, go to home
-          const path = window.location.pathname;
-          const marker = '/frontend/';
-          const idx = path.indexOf(marker);
-          const root = idx !== -1 ? path.substring(0, idx + marker.length) : path.replace(/\/[^/]*$/, '/');
-          window.location.href = root + 'index.html';
-        }
-      });
-    }
+    // Initialize back button (PWA only)
+    Utils.initBackButton();
 
     // Fix nav logo path
     document.getElementById('nav-logo')?.addEventListener('click', () => {

@@ -13,6 +13,44 @@ if (localStorage.getItem('sf_dark') === 'true') {
 
 const Utils = {
 
+  /* ── PWA Detection ───────────────────────────────────────────── */
+  /**
+   * Detects if the app is running as an installed PWA (standalone mode)
+   * Returns true if running as PWA, false if in browser
+   */
+  isPWA() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true ||
+           document.referrer.includes('android-app://');
+  },
+
+  /* ── Initialize Back Button (PWA only) ───────────────────────── */
+  initBackButton() {
+    const backBtn = document.getElementById('nav-back-btn');
+    if (!backBtn) return;
+
+    // Hide in browser, show in PWA
+    if (!this.isPWA()) {
+      backBtn.style.display = 'none';
+    } else {
+      backBtn.style.display = 'block';
+    }
+
+    // Add click handler
+    backBtn.addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        // If no history, go to home
+        const path = window.location.pathname;
+        const marker = '/frontend/';
+        const idx = path.indexOf(marker);
+        const root = idx !== -1 ? path.substring(0, idx + marker.length) : path.replace(/\/[^/]*$/, '/');
+        window.location.href = root + 'index.html';
+      }
+    });
+  },
+
   /* ── XSS Sanitization ────────────────────────────────────────── */
   /**
    * Escapes HTML special characters to prevent XSS attacks.

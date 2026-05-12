@@ -14,7 +14,7 @@
 
 /* Back button for PWA mode */
 .nav-back-btn {
-  display: none;
+  display: none !important;  /* Force hide in browser */
   background: none;
   border: none;
   font-size: 24px;
@@ -34,10 +34,12 @@
   background: var(--border);
 }
 
-/* Show back button in standalone PWA mode */
+/* Show back button ONLY in standalone PWA mode */
 @media (display-mode: standalone) {
   .nav-back-btn {
-    display: block;
+    display: block !important;  /* Override to show in PWA */
+  }
+}
   }
 }
 

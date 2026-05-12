@@ -600,14 +600,8 @@ const SearchPage = {
 
   /* ── Init ──────────────────────────────────────────────────── */
   async init() {
-    // Back button for PWA mode
-    document.getElementById('nav-back-btn')?.addEventListener('click', () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = _rootPath() + 'index.html';
-      }
-    });
+    // Initialize back button (PWA only)
+    Utils.initBackButton();
 
     // Nav
     document.getElementById('nav-logo').addEventListener('click', () => {
