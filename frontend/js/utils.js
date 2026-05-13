@@ -19,9 +19,21 @@ const Utils = {
    * Returns true if running as PWA, false if in browser
    */
   isPWA() {
-    return window.matchMedia('(display-mode: standalone)').matches ||
-           window.navigator.standalone === true ||
-           document.referrer.includes('android-app://');
+    const standalone = window.matchMedia('(display-mode: standalone)').matches;
+    const ios = window.navigator.standalone === true;
+    const android = document.referrer.includes('android-app://');
+    
+    const result = standalone || ios || android;
+    
+    // Debug log (remove in production)
+    console.log('PWA Detection:', {
+      standalone,
+      ios,
+      android,
+      isPWA: result
+    });
+    
+    return result;
   },
 
   /* ── Initialize Back Button (PWA only) ───────────────────────── */
@@ -29,11 +41,23 @@ const Utils = {
     const backBtn = document.getElementById('nav-back-btn');
     if (!backBtn) return;
 
-    // Hide in browser, show in PWA
-    if (!this.isPWA()) {
-      backBtn.style.display = 'none';
-    } else {
+    // Aggressively hide in browser, show in PWA
+    if (this.isPWA()) {
+      // PWA mode - show button
+      backBtn.classList.add('pwa-mode');
       backBtn.style.display = 'block';
+      backBtn.style.visibility = 'visible';
+      backBtn.style.opacity = '1';
+      backBtn.style.position = 'static';
+      backBtn.style.left = 'auto';
+    } else {
+      // Browser mode - force hide
+      backBtn.classList.remove('pwa-mode');
+      backBtn.style.display = 'none';
+      backBtn.style.visibility = 'hidden';
+      backBtn.style.opacity = '0';
+      backBtn.style.position = 'absolute';
+      backBtn.style.left = '-9999px';
     }
 
     // Add click handler

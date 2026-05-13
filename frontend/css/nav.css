@@ -15,6 +15,11 @@
 /* Back button for PWA mode */
 .nav-back-btn {
   display: none !important;  /* Force hide in browser */
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
   background: none;
   border: none;
   font-size: 24px;
@@ -27,6 +32,17 @@
   flex-shrink: 0;
   line-height: 1;
 }
+
+/* Only show when explicitly marked as PWA */
+.nav-back-btn.pwa-mode {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  position: static !important;
+  left: auto !important;
+}
+
 .nav-back-btn:hover {
   background: var(--bg);
 }
@@ -38,6 +54,23 @@
 @media (display-mode: standalone) {
   .nav-back-btn {
     display: block !important;  /* Override to show in PWA */
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: static !important;
+    left: auto !important;
+  }
+}
+
+/* iOS Safari PWA detection */
+@media all and (display-mode: standalone) {
+  .nav-back-btn {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    position: static !important;
+    left: auto !important;
   }
 }
   }
