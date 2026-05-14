@@ -263,7 +263,6 @@
 
 <!-- ── Navbar ─────────────────────────────────────────────────── -->
 <nav class="navbar">
-  <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
   <div class="nav-logo" id="nav-logo">stayfinder</div>
 
   <!-- Compact search bar -->
@@ -600,9 +599,6 @@ const SearchPage = {
 
   /* ── Init ──────────────────────────────────────────────────── */
   async init() {
-    // Initialize back button (PWA only)
-    Utils.initBackButton();
-
     // Nav
     document.getElementById('nav-logo').addEventListener('click', () => {
       window.location.href = _rootPath() + 'index.html';

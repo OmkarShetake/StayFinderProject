@@ -18,7 +18,6 @@
 
 <!-- ── Navbar ─────────────────────────────────────────────────────── -->
 <nav class="navbar">
-  <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
   <div class="nav-logo" id="nav-logo">stayfinder</div>
 
   <div class="nav-search" id="nav-search-bar">
@@ -552,9 +551,6 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
-
-    // Initialize back button (PWA only)
-    Utils.initBackButton();
 
     // Fix nav logo path
     document.getElementById('nav-logo')?.addEventListener('click', () => {

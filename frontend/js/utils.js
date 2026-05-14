@@ -13,68 +13,6 @@ if (localStorage.getItem('sf_dark') === 'true') {
 
 const Utils = {
 
-  /* ── PWA Detection ───────────────────────────────────────────── */
-  /**
-   * Detects if the app is running as an installed PWA (standalone mode)
-   * Returns true if running as PWA, false if in browser
-   */
-  isPWA() {
-    const standalone = window.matchMedia('(display-mode: standalone)').matches;
-    const ios = window.navigator.standalone === true;
-    const android = document.referrer.includes('android-app://');
-    
-    const result = standalone || ios || android;
-    
-    // Debug log (remove in production)
-    console.log('PWA Detection:', {
-      standalone,
-      ios,
-      android,
-      isPWA: result
-    });
-    
-    return result;
-  },
-
-  /* ── Initialize Back Button (PWA only) ───────────────────────── */
-  initBackButton() {
-    const backBtn = document.getElementById('nav-back-btn');
-    if (!backBtn) return;
-
-    // Aggressively hide in browser, show in PWA
-    if (this.isPWA()) {
-      // PWA mode - show button
-      backBtn.classList.add('pwa-mode');
-      backBtn.style.display = 'block';
-      backBtn.style.visibility = 'visible';
-      backBtn.style.opacity = '1';
-      backBtn.style.position = 'static';
-      backBtn.style.left = 'auto';
-    } else {
-      // Browser mode - force hide
-      backBtn.classList.remove('pwa-mode');
-      backBtn.style.display = 'none';
-      backBtn.style.visibility = 'hidden';
-      backBtn.style.opacity = '0';
-      backBtn.style.position = 'absolute';
-      backBtn.style.left = '-9999px';
-    }
-
-    // Add click handler
-    backBtn.addEventListener('click', () => {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        // If no history, go to home
-        const path = window.location.pathname;
-        const marker = '/frontend/';
-        const idx = path.indexOf(marker);
-        const root = idx !== -1 ? path.substring(0, idx + marker.length) : path.replace(/\/[^/]*$/, '/');
-        window.location.href = root + 'index.html';
-      }
-    });
-  },
-
   /* ── XSS Sanitization ────────────────────────────────────────── */
   /**
    * Escapes HTML special characters to prevent XSS attacks.

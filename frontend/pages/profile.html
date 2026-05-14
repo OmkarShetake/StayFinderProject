@@ -15,7 +15,6 @@
 <body>
 
 <nav class="navbar">
-  <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
   <div class="nav-logo" id="nav-logo">stayfinder</div>
   <div class="nav-right">
     <div class="nav-user" id="nav-user-btn" style="position:relative">
@@ -236,9 +235,6 @@
 
     // Sign out
     document.getElementById('signout-btn').addEventListener('click', () => Auth.logout());
-
-    // Initialize back button (PWA only)
-    Utils.initBackButton();
 
     // Nav logo
     document.getElementById('nav-logo').addEventListener('click', () => {

@@ -83,7 +83,6 @@
 <body>
 
 <nav class="navbar">
-  <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
   <div class="nav-logo" id="nav-logo">stayfinder</div>
   <div class="nav-right">
     <button id="dark-mode-btn" title="Toggle dark mode">🌙</button>
@@ -117,11 +116,6 @@
   }
 
   document.addEventListener('DOMContentLoaded', async () => {
-    // Back button
-    document.getElementById('nav-back-btn')?.addEventListener('click', () => {
-      window.location.href = _rootPath() + 'index.html';
-    });
-
     // Nav logo
     document.getElementById('nav-logo').addEventListener('click', () => {
       window.location.href = _rootPath() + 'index.html';

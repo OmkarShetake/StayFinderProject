@@ -13,7 +13,6 @@
 
 <!-- Navbar -->
 <nav class="navbar">
-    <button class="nav-back-btn" id="nav-back-btn" title="Go back">←</button>
     <div class="nav-logo" id="nav-logo">stayfinder</div>
     <div class="nav-right">
         <button class="nav-link" id="btn-explore">Explore</button>
@@ -131,9 +130,6 @@
                 setTimeout(() => window.location.href = _rootPath() + 'index.html', 1500);
                 return;
             }
-
-            // Initialize back button (PWA only)
-            Utils.initBackButton();
 
             document.getElementById('nav-logo').addEventListener('click', () => {
                 window.location.href = _rootPath() + 'index.html';
