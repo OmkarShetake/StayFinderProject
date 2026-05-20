@@ -1,6 +1,4 @@
--- =============================================
--- V5: Email verification columns
--- =============================================
+
 
 -- Add email verification columns to users table
 ALTER TABLE users
