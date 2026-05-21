@@ -94,6 +94,17 @@ public class PropertyController {
     }
 
     // ── Host endpoints ────────────────────────────────────────────
+    @PostMapping("/host/properties/generate-description")
+    public ResponseEntity<Map<String, String>> generateDescription(
+            @Valid @RequestBody GenerateDescriptionRequest request) {
+        String description = propertyService.generateDescription(request);
+        if (description != null) {
+            return ResponseEntity.ok(Map.of("description", description));
+        } else {
+            return ResponseEntity.ok(Map.of("description", "", "error", "AI service unavailable"));
+        }
+    }
+
     @PostMapping("/host/properties")
     public ResponseEntity<PropertyResponse> createProperty(
             @Valid @RequestBody CreatePropertyRequest request,

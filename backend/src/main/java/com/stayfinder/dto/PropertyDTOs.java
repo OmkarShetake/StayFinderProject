@@ -150,4 +150,15 @@ public class PropertyDTOs {
         @NotNull private boolean available;
         private BigDecimal customPrice;
     }
+
+    @Data
+    public static class GenerateDescriptionRequest {
+        @NotBlank private String propertyType;
+        @NotBlank private String city;
+        @NotBlank private String state;
+        @Min(1) private int bedrooms;
+        @Min(1) private int bathrooms;
+        @Min(1) private int maxGuests;
+        private List<String> amenities;
+    }
 }

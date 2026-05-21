@@ -452,6 +452,76 @@ const HostDashboard = {
     this.uploadedImageUrls = [];
     this._renderImagePreview();
     Utils.showModal('add-listing-modal');
+    
+    // Setup AI generate button
+    const aiBtn = document.getElementById('ai-generate-desc-btn');
+    if (aiBtn) {
+      aiBtn.onclick = () => this.generateAIDescription();
+    }
+  },
+
+  async generateAIDescription() {
+    const btn = document.getElementById('ai-generate-desc-btn');
+    const descTextarea = document.getElementById('al-description');
+    
+    // Validate required fields
+    const propertyType = document.getElementById('al-type').value;
+    const city = document.getElementById('al-city').value.trim();
+    const state = document.getElementById('al-state').value.trim();
+    const bedrooms = document.getElementById('al-bedrooms').value;
+    const bathrooms = document.getElementById('al-bathrooms').value;
+    const maxGuests = document.getElementById('al-guests').value;
+    
+    if (!city || !state) {
+      Utils.toast('Please fill in City and State first');
+      return;
+    }
+    
+    // Get selected amenities
+    const amenities = [
+      ...document.querySelectorAll('#al-amenities-grid input[type=checkbox]:checked')
+    ].map(cb => cb.value);
+    
+    // Disable button and show loading
+    btn.disabled = true;
+    btn.classList.add('loading');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '✨ Generating...';
+    
+    try {
+      const response = await fetch(API.BASE + '/host/properties/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + Auth.getToken()
+        },
+        body: JSON.stringify({
+          propertyType,
+          city,
+          state,
+          bedrooms: parseInt(bedrooms) || 1,
+          bathrooms: parseInt(bathrooms) || 1,
+          maxGuests: parseInt(maxGuests) || 1,
+          amenities: amenities.length ? amenities : []
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.description) {
+        descTextarea.value = data.description;
+        Utils.toast('✨ Description generated!');
+      } else {
+        Utils.toast(data.error || 'AI service unavailable');
+      }
+    } catch (error) {
+      console.error('AI generation error:', error);
+      Utils.toast('Failed to generate description');
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove('loading');
+      btn.innerHTML = originalText;
+    }
   },
 
   async submitListing(e) {

@@ -28,6 +28,7 @@ public class PropertyService {
     private final WishlistRepository wishlistRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final GeminiAIService geminiAIService;
 
     @Transactional
     public PropertyResponse createProperty(CreatePropertyRequest req, Long hostId) {
@@ -204,5 +205,21 @@ public class PropertyService {
         propertyRepository.deleteById(propertyId);
 
         log.info("Property {} deleted by admin", propertyId);
+    }
+
+    /* ── AI: Generate property description ──────────────────────── */
+    public String generateDescription(GenerateDescriptionRequest req) {
+        log.info("Generating AI description for {} in {}, {}", 
+            req.getPropertyType(), req.getCity(), req.getState());
+        
+        return geminiAIService.generatePropertyDescription(
+            req.getPropertyType(),
+            req.getCity(),
+            req.getState(),
+            req.getBedrooms(),
+            req.getBathrooms(),
+            req.getMaxGuests(),
+            req.getAmenities()
+        );
     }
 }

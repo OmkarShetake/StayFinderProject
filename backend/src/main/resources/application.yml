@@ -29,6 +29,7 @@ spring:
   flyway:
     enabled:   true
     locations: classpath:db/migration
+    validate-on-migrate: false
 
   web:
     resources:
@@ -65,6 +66,12 @@ stayfinder:
   mail:
     enabled: ${MAIL_ENABLED:true}   # set to false to disable emails during dev/testing
     from:    ${MAIL_FROM:StayFinder <noreply@stayfinder.com>}
+
+# ── Google Gemini AI ─────────────────────────────────────────────────
+gemini:
+  api:
+    key:     ${GEMINI_API_KEY}
+    enabled: ${GEMINI_ENABLED:true}
 
 # ── Actuator ────────────────────────────────────────────────────────
 management:
