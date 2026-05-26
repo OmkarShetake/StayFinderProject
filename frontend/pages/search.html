@@ -257,6 +257,118 @@
       transform: scale(1.1);
     }
 
+    /* ── AI Recommendations Banner ─────────────────────────────── */
+    .ai-recommendations-banner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+      animation: slideDown 0.4s ease-out;
+    }
+    .ai-recommendations-banner.hidden { display: none; }
+    .ai-rec-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .ai-rec-content { flex: 1; }
+    .ai-rec-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      opacity: 0.95;
+    }
+    .ai-rec-text {
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+    .ai-rec-close {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background var(--transition);
+    }
+    .ai-rec-close:hover { background: rgba(255,255,255,0.3); }
+
+    /* ── Natural Language Search ───────────────────────────────── */
+    .nl-search-container {
+      margin-bottom: 24px;
+    }
+    .nl-search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .nl-search-input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+      outline: none;
+      transition: all var(--transition);
+    }
+    .nl-search-input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255, 56, 92, 0.1);
+    }
+    .nl-search-btn {
+      padding: 14px 24px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .nl-search-btn:hover {
+      background: var(--red-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 56, 92, 0.3);
+    }
+    .nl-search-hint {
+      font-size: 12px;
+      color: var(--text-2);
+      padding-left: 4px;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
   </style>
 </head>
 <body>
@@ -481,6 +593,35 @@
       </div>
     </div>
 
+    <!-- AI Personalized Recommendations Banner -->
+    <div id="ai-recommendations-banner" class="ai-recommendations-banner hidden">
+      <div class="ai-rec-icon">✨</div>
+      <div class="ai-rec-content">
+        <div class="ai-rec-title">Personalized for you</div>
+        <div class="ai-rec-text" id="ai-rec-text">Loading recommendations...</div>
+      </div>
+      <button class="ai-rec-close" onclick="SearchPage.closeRecommendations()">✕</button>
+    </div>
+
+    <!-- Natural Language Search -->
+    <div class="nl-search-container">
+      <div class="nl-search-box">
+        <input 
+          type="text" 
+          id="nl-search-input" 
+          class="nl-search-input" 
+          placeholder="Try: 'romantic beachfront villa for honeymoon' or 'family home in Mumbai with pool'"
+        />
+        <button class="nl-search-btn" id="nl-search-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          Search
+        </button>
+      </div>
+      <div class="nl-search-hint">💡 Describe what you're looking for in your own words</div>
+    </div>
+
     <!-- Grid view -->
     <div class="prop-grid" id="results-grid" style="padding:0"></div>
 
@@ -637,6 +778,24 @@ const SearchPage = {
     // Map/Grid toggle
     document.getElementById('btn-grid-view')?.addEventListener('click', () => this.switchView('grid'));
     document.getElementById('btn-map-view')?.addEventListener('click',  () => this.switchView('map'));
+
+    // Natural Language Search
+    const nlSearchBtn = document.getElementById('nl-search-btn');
+    const nlSearchInput = document.getElementById('nl-search-input');
+    
+    if (nlSearchBtn) {
+      nlSearchBtn.addEventListener('click', () => this.handleNaturalSearch());
+    }
+    if (nlSearchInput) {
+      nlSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') this.handleNaturalSearch();
+      });
+    }
+
+    // Load personalized recommendations
+    if (Auth.isLoggedIn()) {
+      this.loadPersonalizedRecommendations();
+    }
 
     // Load results
     await this.loadResults(0);
@@ -1019,6 +1178,94 @@ const SearchPage = {
     } catch (e) {
       Utils.toast('Error: ' + e.message);
     }
+  },
+
+  /* ── AI: Load Personalized Recommendations ────────────────── */
+  async loadPersonalizedRecommendations() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const searchQuery = urlParams.get('city') || '';
+      
+      const data = await API.getPersonalizedRecommendations(searchQuery);
+      
+      if (data.recommendation && data.hasHistory) {
+        const banner = document.getElementById('ai-recommendations-banner');
+        const text = document.getElementById('ai-rec-text');
+        
+        if (banner && text) {
+          text.textContent = data.recommendation;
+          banner.classList.remove('hidden');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load recommendations:', e.message);
+      // Silently fail - recommendations are optional
+    }
+  },
+
+  /* ── AI: Handle Natural Language Search ────────────────────── */
+  async handleNaturalSearch() {
+    const input = document.getElementById('nl-search-input');
+    const query = input.value.trim();
+    
+    if (!query) {
+      Utils.toast('Please enter a search query');
+      return;
+    }
+
+    const btn = document.getElementById('nl-search-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Searching...';
+
+    try {
+      const interpretation = await API.interpretNaturalSearch(query);
+      console.log('AI Interpretation:', interpretation);
+
+      // Apply interpreted filters (check if elements exist first)
+      if (interpretation.CITY) {
+        const cityInput = document.getElementById('f-city');
+        if (cityInput) cityInput.value = interpretation.CITY;
+      }
+      if (interpretation.CATEGORY) {
+        const catSelect = document.getElementById('f-category');
+        if (catSelect) catSelect.value = interpretation.CATEGORY;
+      }
+      if (interpretation.PROPERTY_TYPE) {
+        const typeSelect = document.getElementById('f-type');
+        if (typeSelect) typeSelect.value = interpretation.PROPERTY_TYPE;
+      }
+      if (interpretation.GUESTS) {
+        const guestsInput = document.getElementById('f-guests');
+        if (guestsInput) guestsInput.value = interpretation.GUESTS;
+      }
+
+      // Show toast with interpretation
+      const parts = [];
+      if (interpretation.CITY) parts.push(`📍 ${interpretation.CITY}`);
+      if (interpretation.CATEGORY) parts.push(`🏖️ ${interpretation.CATEGORY}`);
+      if (interpretation.GUESTS) parts.push(`👥 ${interpretation.GUESTS} guests`);
+      
+      if (parts.length > 0) {
+        Utils.toast('Found: ' + parts.join(' • '));
+      } else {
+        Utils.toast('Searching for: ' + query);
+      }
+
+      // Apply filters and search
+      this.applyFilters();
+
+    } catch (e) {
+      console.error('Natural search failed:', e.message);
+      Utils.toast('Search failed. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search';
+    }
+  },
+
+  /* ── Close Recommendations Banner ──────────────────────────── */
+  closeRecommendations() {
+    document.getElementById('ai-recommendations-banner').classList.add('hidden');
   },
 
 };

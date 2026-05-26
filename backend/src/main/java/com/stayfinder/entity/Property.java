@@ -90,6 +90,9 @@ public class Property {
     @Column(name = "total_reviews")
     private int totalReviews = 0;
 
+    @Column(name = "review_summary", columnDefinition = "TEXT")
+    private String reviewSummary;
+
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "property_amenities", joinColumns = @JoinColumn(name = "property_id"))
     @Column(name = "amenity")

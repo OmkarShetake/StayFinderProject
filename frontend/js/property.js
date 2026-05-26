@@ -85,6 +85,18 @@ const PropertyPage = {
       document.getElementById('detail-superhost').classList.remove('hidden');
     }
 
+    // Review summary (if available)
+    if (p.reviewSummary) {
+      const ratingHdr = document.getElementById('rating-hdr');
+      if (ratingHdr && !document.getElementById('review-summary-text')) {
+        const summaryDiv = document.createElement('div');
+        summaryDiv.id = 'review-summary-text';
+        summaryDiv.className = 'review-summary-highlight';
+        summaryDiv.innerHTML = `✨ ${Utils.esc(p.reviewSummary)}`;
+        ratingHdr.after(summaryDiv);
+      }
+    }
+
     // Photos — sanitize URLs
     const imgs      = p.images || [];
     const photoMain   = document.getElementById('photo-main');

@@ -1,8 +1,10 @@
 package com.stayfinder.controller;
 
 import com.stayfinder.dto.PropertyDTOs.*;
+import com.stayfinder.entity.Property;
 import com.stayfinder.entity.User;
 import com.stayfinder.repository.PropertyAvailabilityRepository;
+import com.stayfinder.repository.PropertyRepository;
 import com.stayfinder.service.PropertyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -25,6 +28,7 @@ public class PropertyController {
 
     private final PropertyService propertyService;
     private final PropertyAvailabilityRepository availabilityRepository;
+    private final PropertyRepository propertyRepository;
 
     // ── Public endpoints ──────────────────────────────────────────
     @GetMapping("/properties/search")
@@ -154,5 +158,89 @@ public class PropertyController {
     public ResponseEntity<Map<String, String>> deleteProperty(@PathVariable Long id) {
         propertyService.deleteProperty(id);
         return ResponseEntity.ok(Map.of("message", "Property deleted successfully"));
+    }
+
+    @PostMapping("/admin/properties/generate-review-summaries")
+    public ResponseEntity<Map<String, Object>> generateReviewSummaries() {
+        Map<String, Object> result = propertyService.generateReviewSummariesManually();
+        return ResponseEntity.ok(result);
+    }
+
+    // ── AI: Personalized Recommendations ─────────────────────────
+    @GetMapping("/properties/recommendations")
+    public ResponseEntity<Map<String, Object>> getPersonalizedRecommendations(
+            @RequestParam(required = false) String query,
+            @AuthenticationPrincipal User user) {
+        if (user == null) {
+            return ResponseEntity.ok(Map.of(
+                "recommendation", "",
+                "hasHistory", false,
+                "message", "Login to get personalized recommendations"
+            ));
+        }
+        Map<String, Object> recommendations = propertyService.getPersonalizedRecommendations(
+            user.getId(), 
+            query
+        );
+        return ResponseEntity.ok(recommendations);
+    }
+
+    @PostMapping("/properties/interpret-search")
+    public ResponseEntity<Map<String, String>> interpretNaturalSearch(
+            @RequestBody Map<String, String> request) {
+        String query = request.get("query");
+        if (query == null || query.isBlank()) {
+            return ResponseEntity.ok(Map.of());
+        }
+        Map<String, String> interpretation = propertyService.interpretNaturalSearch(query);
+        return ResponseEntity.ok(interpretation);
+    }
+
+    // ── AI: Smart Price Recommendation ───────────────────────────
+    @GetMapping("/host/properties/{id}/price-recommendation")
+    public ResponseEntity<Map<String, Object>> getSmartPriceRecommendation(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User user) {
+        // Verify the property belongs to the host
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Property not found"));
+        
+        if (!property.getHost().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Unauthorized"));
+        }
+
+        Map<String, Object> recommendation = propertyService.getSmartPriceRecommendation(id);
+        return ResponseEntity.ok(recommendation);
+    }
+
+    @PostMapping("/host/properties/price-recommendation-preview")
+    public ResponseEntity<Map<String, Object>> getSmartPriceRecommendationPreview(
+            @RequestBody Map<String, Object> request,
+            @AuthenticationPrincipal User user) {
+        
+        try {
+            String city = (String) request.get("city");
+            String state = (String) request.get("state");
+            String propertyType = (String) request.get("propertyType");
+            String category = (String) request.get("category");
+            Integer bedrooms = (Integer) request.get("bedrooms");
+            Integer bathrooms = (Integer) request.get("bathrooms");
+            Integer maxGuests = (Integer) request.get("maxGuests");
+            List<String> amenities = (List<String>) request.get("amenities");
+            Double currentPrice = request.get("currentPrice") != null 
+                ? ((Number) request.get("currentPrice")).doubleValue() 
+                : null;
+
+            Map<String, Object> recommendation = propertyService.getSmartPriceRecommendationPreview(
+                city, state, propertyType, category, bedrooms, bathrooms, 
+                maxGuests, amenities, currentPrice
+            );
+
+            return ResponseEntity.ok(recommendation);
+
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("error", "Failed to generate recommendation: " + e.getMessage()));
+        }
     }
 }

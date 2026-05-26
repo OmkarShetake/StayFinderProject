@@ -240,3 +240,268 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
+
+/* ── Smart Price Recommendation ──────────────────────────────────── */
+.btn-ai-price {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.btn-ai-price:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+}
+
+.btn-ai-price:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.price-rec-panel {
+  background: white;
+  border: 2px solid #f5576c;
+  border-radius: 12px;
+  padding: 0;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 24px rgba(245, 87, 108, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+.price-rec-panel.hidden {
+  display: none;
+}
+
+.price-rec-header {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 10px 10px 0 0;
+}
+
+.price-rec-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.price-rec-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.price-rec-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.price-rec-content {
+  padding: 24px;
+}
+
+.price-rec-loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--text-2);
+}
+
+.price-rec-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.price-rec-card {
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.price-rec-card-label {
+  font-size: 12px;
+  color: var(--text-2);
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.price-rec-card-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.price-rec-card.recommended {
+  background: linear-gradient(135deg, #f093fb15 0%, #f5576c15 100%);
+  border: 2px solid #f5576c;
+}
+
+.price-rec-card.recommended .price-rec-card-value {
+  color: #f5576c;
+}
+
+.price-rec-confidence {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.price-rec-confidence.high {
+  background: #d4edda;
+  color: #155724;
+}
+
+.price-rec-confidence.medium {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.price-rec-confidence.low {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.price-rec-reasoning {
+  background: var(--bg);
+  border-left: 4px solid #f5576c;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.price-rec-reasoning-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.price-rec-reasoning-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.price-rec-tips {
+  margin-top: 20px;
+}
+
+.price-rec-tips-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.price-rec-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.price-rec-tip-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.price-rec-tip-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-2);
+}
+
+.price-rec-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-apply-price {
+  flex: 1;
+  background: #f5576c;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-apply-price:hover {
+  background: #e04658;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.3);
+}
+
+.btn-cancel-price {
+  flex: 1;
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel-price:hover {
+  background: var(--bg);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .price-rec-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .price-rec-actions {
+    flex-direction: column;
+  }
+}

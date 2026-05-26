@@ -242,6 +242,7 @@ const Search = {
           <div class="prop-card-loc">${city}${state ? ', ' + state : ''}</div>
           ${rating > 0 ? `<div class="prop-card-rating">★ ${rating.toFixed(2)}</div>` : ''}
         </div>
+        ${p.reviewSummary ? `<div class="prop-card-summary">✨ ${Utils.esc(p.reviewSummary)}</div>` : ''}
         <div class="prop-card-type">${typeLabel} · ${beds} bed${beds !== 1 ? 's' : ''}</div>
         <div class="prop-card-price"><strong>${price}</strong> night</div>
       </div>`;

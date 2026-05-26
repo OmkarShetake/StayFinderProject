@@ -64,6 +64,7 @@ public class PropertyDTOs {
         private String status;
         private BigDecimal avgRating;
         private int totalReviews;
+        private String reviewSummary;
         private Set<String> amenities;
         private List<String> images;
         private boolean wishlisted;
@@ -99,6 +100,7 @@ public class PropertyDTOs {
             r.status = p.getStatus().name();
             r.avgRating = p.getAvgRating();
             r.totalReviews = p.getTotalReviews();
+            r.reviewSummary = p.getReviewSummary();
             r.amenities = p.getAmenities();
             r.images = p.getImages().stream()
                     .map(PropertyImage::getImageUrl)

@@ -625,3 +625,156 @@ const HostDashboard = {
 
 window.HostDashboard = HostDashboard;
 document.addEventListener('DOMContentLoaded', () => HostDashboard.init());
+
+
+// ── AI: Smart Price Recommendation ──────────────────────────────────
+HostDashboard.getSmartPriceRecommendation = async function() {
+  // Validate required fields
+  const city = document.getElementById('al-city')?.value?.trim();
+  const state = document.getElementById('al-state')?.value?.trim();
+  const type = document.getElementById('al-type')?.value;
+  const category = document.getElementById('al-category')?.value;
+
+  if (!city || !state || !type || !category) {
+    Utils.toast('Please fill in location, type, and category first');
+    return;
+  }
+
+  const panel = document.getElementById('price-recommendation-panel');
+  const content = document.getElementById('price-rec-content');
+  
+  // Show panel with loading state
+  panel.classList.remove('hidden');
+  content.innerHTML = '<div class="price-rec-loading"><div class="spinner"></div><p style="margin-top:16px">Analyzing market data and generating recommendation...</p></div>';
+
+  try {
+    const bedrooms = parseInt(document.getElementById('al-bedrooms')?.value || 1);
+    const bathrooms = parseInt(document.getElementById('al-bathrooms')?.value || 1);
+    const maxGuests = parseInt(document.getElementById('al-guests')?.value || 2);
+    const currentPrice = parseFloat(document.getElementById('al-price')?.value || 0);
+
+    // Get selected amenities
+    const amenities = [];
+    document.querySelectorAll('input[name="amenities"]:checked').forEach(cb => {
+      amenities.push(cb.value);
+    });
+
+    // Call API
+    const data = await API._req('POST', '/host/properties/price-recommendation-preview', {
+      city,
+      state,
+      propertyType: type,
+      category,
+      bedrooms,
+      bathrooms,
+      maxGuests,
+      amenities,
+      currentPrice: currentPrice > 0 ? currentPrice : null
+    });
+
+    HostDashboard._renderPriceRecommendation(data);
+
+  } catch (e) {
+    console.error('Failed to get price recommendation:', e.message);
+    content.innerHTML = `
+      <div class="price-rec-loading">
+        <p style="color:var(--red)">❌ Failed to generate recommendation</p>
+        <p style="font-size:13px;color:var(--text-2);margin-top:8px">${e.message}</p>
+        <button class="btn-cancel-price" style="margin-top:16px" onclick="Host.closePriceRecommendation()">Close</button>
+      </div>`;
+  }
+};
+
+HostDashboard._renderPriceRecommendation = function(data) {
+  const content = document.getElementById('price-rec-content');
+  
+  if (data.error) {
+    content.innerHTML = `
+      <div class="price-rec-loading">
+        <p style="color:var(--red)">❌ ${data.error}</p>
+        <button class="btn-cancel-price" style="margin-top:16px" onclick="Host.closePriceRecommendation()">Close</button>
+      </div>`;
+    return;
+  }
+
+  const formatPrice = (price) => price ? `₹${Math.round(price).toLocaleString('en-IN')}` : 'N/A';
+  const confidence = (data.confidence || 'MEDIUM').toLowerCase();
+
+  content.innerHTML = `
+    <div class="price-rec-grid">
+      <div class="price-rec-card recommended">
+        <div class="price-rec-card-label">Recommended</div>
+        <div class="price-rec-card-value">${formatPrice(data.recommendedPrice)}</div>
+        <div class="price-rec-confidence ${confidence}">${data.confidence || 'MEDIUM'}</div>
+      </div>
+      <div class="price-rec-card">
+        <div class="price-rec-card-label">Weekend</div>
+        <div class="price-rec-card-value">${formatPrice(data.weekendPrice)}</div>
+      </div>
+      <div class="price-rec-card">
+        <div class="price-rec-card-label">Min Price</div>
+        <div class="price-rec-card-value">${formatPrice(data.minPrice)}</div>
+      </div>
+      <div class="price-rec-card">
+        <div class="price-rec-card-label">Max Price</div>
+        <div class="price-rec-card-value">${formatPrice(data.maxPrice)}</div>
+      </div>
+    </div>
+
+    ${data.reasoning ? `
+      <div class="price-rec-reasoning">
+        <div class="price-rec-reasoning-title">💡 Why this price?</div>
+        <div class="price-rec-reasoning-text">${Utils.esc(data.reasoning)}</div>
+      </div>
+    ` : ''}
+
+    ${data.tips && data.tips.length > 0 ? `
+      <div class="price-rec-tips">
+        <div class="price-rec-tips-title">🎯 Tips to increase bookings</div>
+        ${data.tips.map(tip => `
+          <div class="price-rec-tip">
+            <div class="price-rec-tip-icon">✓</div>
+            <div class="price-rec-tip-text">${Utils.esc(tip)}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+
+    <div class="price-rec-actions">
+      <button class="btn-apply-price" onclick="Host.applyRecommendedPrice(${data.recommendedPrice})">
+        Apply Recommended Price
+      </button>
+      <button class="btn-cancel-price" onclick="Host.closePriceRecommendation()">
+        Cancel
+      </button>
+    </div>
+  `;
+};
+
+HostDashboard.applyRecommendedPrice = function(price) {
+  const priceInput = document.getElementById('al-price');
+  if (priceInput && price) {
+    priceInput.value = Math.round(price);
+    Utils.toast('✓ Price applied: ₹' + Math.round(price).toLocaleString('en-IN'));
+    this.closePriceRecommendation();
+  }
+};
+
+HostDashboard.closePriceRecommendation = function() {
+  const panel = document.getElementById('price-recommendation-panel');
+  if (panel) panel.classList.add('hidden');
+};
+
+// Make Host available globally
+window.Host = HostDashboard;
+
+
+// Add event listener for smart price button
+document.addEventListener('DOMContentLoaded', () => {
+  const smartPriceBtn = document.getElementById('btn-smart-price');
+  if (smartPriceBtn) {
+    smartPriceBtn.addEventListener('click', () => {
+      Host.getSmartPriceRecommendation();
+    });
+  }
+});

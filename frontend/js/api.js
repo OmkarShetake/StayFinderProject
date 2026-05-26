@@ -78,6 +78,14 @@ const API = {
     toggleWishlist: (propertyId) => API._req('POST', `/wishlists/${propertyId}`),
     getWishlist: ()              => API._req('GET', '/wishlists'),
 
+    /* ── AI-Powered Search & Recommendations ────────────────────── */
+    getPersonalizedRecommendations: (query = '') =>
+        API._req('GET', `/properties/recommendations?query=${encodeURIComponent(query)}`),
+    interpretNaturalSearch: (query) =>
+        API._req('POST', '/properties/interpret-search', { query }),
+    getSmartPriceRecommendation: (propertyId) =>
+        API._req('GET', `/host/properties/${propertyId}/price-recommendation`),
+
     /* ── Bookings ───────────────────────────────────────────────── */
     createBooking:   (body) => API._req('POST', '/bookings', body),
     getMyBookings:   (p = 0) => API._req('GET', `/bookings?page=${p}`),

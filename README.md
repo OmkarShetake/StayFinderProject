@@ -3,6 +3,7 @@
 <img src="https://img.shields.io/badge/Java-21-FF6B35?style=for-the-badge&logo=openjdk&logoColor=white"/>
 <img src="https://img.shields.io/badge/Spring_Boot-3.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
 <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+<img src="https://img.shields.io/badge/Google_Gemini_AI-2.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white"/>
 <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
 <img src="https://img.shields.io/badge/WebSocket-STOMP-FF385C?style=for-the-badge&logo=socket.io&logoColor=white"/>
 <img src="https://img.shields.io/badge/Cloudinary-Image_Upload-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white"/>
@@ -22,12 +23,12 @@
 ╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝     ╚═╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 ```
 
-### 🏠 A full-stack Airbnb-inspired property rental platform
-### *Real-time notifications · JWT auth · Cloudinary uploads · Email alerts · Admin panel · PWA · Map view · Chat*
+### 🏠 A full-stack AI-powered Airbnb-inspired property rental platform
+### *🤖 Google Gemini AI · Real-time notifications · JWT auth · Cloudinary uploads · Email alerts · Admin panel · PWA · Map view · Chat*
 
 <br/>
 
-[🚀 Quick Start](#-quick-start) · [✨ Features](#-features) · [🏗 Architecture](#-architecture) · [📡 API Reference](#-api-reference) · [🛠 Tech Stack](#-tech-stack) · [📸 Screenshots](#-screenshots)
+[🚀 Quick Start](#-quick-start) · [🤖 AI Features](#-ai-features-powered-by-google-gemini) · [✨ Features](#-features) · [🏗 Architecture](#-architecture) · [📡 API Reference](#-api-reference) · [🛠 Tech Stack](#-tech-stack) · [📸 Screenshots](#-screenshots)
 
 </div>
 
@@ -35,9 +36,108 @@
 
 ## 📖 Overview
 
-**StayFinder** is a production-grade Airbnb clone built with **Spring Boot 3** and **Vanilla JS**. It implements the complete rental marketplace workflow — from property listing and approval to booking, review, real-time notifications, and host/guest chat — with a clean REST API, WebSocket push, map view, PWA support, and a responsive frontend served through nginx.
+**StayFinder** is a production-grade AI-powered Airbnb clone built with **Spring Boot 3**, **Google Gemini AI**, and **Vanilla JS**. It implements the complete rental marketplace workflow — from AI-generated property descriptions and smart pricing to booking, review summaries, real-time notifications, and host/guest chat — with a clean REST API, WebSocket push, map view, PWA support, and a responsive frontend served through nginx.
 
-> Built as a full-stack portfolio project demonstrating enterprise Java patterns, security best practices, real-time communication, and modern frontend architecture.
+> Built as a full-stack portfolio project demonstrating enterprise Java patterns, AI integration, security best practices, real-time communication, and modern frontend architecture.
+
+---
+
+## 🤖 AI Features (Powered by Google Gemini)
+
+StayFinder leverages **Google Gemini AI (gemini-2.5-flash)** to provide intelligent, production-ready features that rival major platforms like Airbnb and Booking.com.
+
+### ✨ AI Property Description Generator
+**For Hosts** · *Save time, create professional listings*
+
+- 🎯 **What**: Generates compelling 3-4 sentence property descriptions
+- 🔧 **How**: Analyzes location, amenities, capacity, and property type
+- 📍 **Where**: Host Dashboard → Add Listing → "✨ AI Generate" button
+- 🚀 **API**: `POST /api/v1/host/properties/generate-description`
+
+**Example Output**:
+```
+"Experience luxury in the heart of Mumbai with this stunning 2-bedroom 
+apartment. Perfect for families or business travelers, featuring modern 
+amenities including WiFi, AC, and a fully equipped kitchen. Located in 
+a prime business district with excellent connectivity."
+```
+
+### 📊 AI Review Summary
+**For All Users** · *Quick insights from guest reviews*
+
+- 🎯 **What**: Summarizes all reviews into one concise sentence (15-20 words)
+- 🔧 **How**: Highlights common positive themes and specific aspects
+- 📍 **Where**: Search results & property detail pages
+- 🚀 **API**: Automatic (scheduler runs daily at 2 AM)
+- 🔄 **Manual**: `POST /api/v1/admin/properties/generate-review-summaries`
+
+**Example Output**:
+```
+"Guests loved the spotless rooms, central location, and the host's warm hospitality."
+```
+
+### 🔍 AI-Powered Natural Language Search
+**For Guests** · *Search like you talk*
+
+- 🎯 **What**: Interprets natural queries like "romantic beachfront villa for honeymoon"
+- 🔧 **How**: Extracts city, property type, guests, dates, and keywords
+- 📍 **Where**: Search page → Natural language search box
+- 🚀 **API**: `POST /api/v1/properties/interpret-search`
+
+**Example**:
+```
+Query: "family home in Mumbai with pool"
+→ Interprets: City=Mumbai, Type=ENTIRE_HOME, Guests=4, Keywords=pool,family
+```
+
+### 🎯 Personalized Recommendations
+**For Guests** · *Discover properties you'll love*
+
+- 🎯 **What**: Recommends properties based on booking history and preferences
+- 🔧 **How**: Analyzes past bookings, favorite cities, and travel patterns
+- 📍 **Where**: Search page → Personalized banner
+- 🚀 **API**: `GET /api/v1/properties/recommendations`
+
+**Example Output**:
+```
+"Based on your love for city properties, you might enjoy our spacious 
+apartments in Mumbai. Since you usually travel with 4 guests, we've 
+highlighted family-friendly homes with great amenities."
+```
+
+### 💰 Smart Price Recommendation
+**For Hosts** · *Optimize revenue with AI pricing*
+
+- 🎯 **What**: Suggests optimal pricing based on market data, location, season, and features
+- 🔧 **How**: Analyzes comparable properties, demand patterns, and property attributes
+- 📍 **Where**: Host Dashboard → Add Listing → "💰 Smart Price" button
+- 🚀 **API**: `GET /api/v1/host/properties/{id}/price-recommendation`
+
+**Example Output**:
+```
+Recommended: ₹3,500 | Weekend: ₹4,200 | Range: ₹2,800 - ₹5,000
+Confidence: HIGH
+
+Reasoning: "Based on your property's location in a popular tourist area 
+with premium amenities, the recommended price is competitive yet profitable."
+
+Tips:
+✓ Add professional photos to increase bookings by 40%
+✓ Offer weekly discounts to attract longer stays
+✓ Highlight unique amenities in your description
+```
+
+### 📈 AI Impact & Benefits
+
+| Feature | User Type | Impact | API Calls/Day |
+|---------|-----------|--------|---------------|
+| **Property Description** | Host | High - Better listings | ~5 |
+| **Review Summary** | All | Medium - Quick insights | ~3 |
+| **Natural Search** | Guest | High - Better discovery | ~8 |
+| **Personalized Recs** | Guest | Medium - Engagement | ~2 |
+| **Smart Pricing** | Host | High - Revenue optimization | ~2 |
+
+**Total**: ~20 API calls/day (Free tier: 20/day) · **Cost**: ~$0.33/month for 1000 users (Paid tier)
 
 ---
 
@@ -57,6 +157,8 @@
 ### 🏠 Property Management
 | Feature | Detail |
 |---|---|
+| **✨ AI Description Generator** | **Generate professional descriptions with one click** |
+| **💰 Smart Price Recommendation** | **AI-powered pricing based on market data & season** |
 | Create Listings | Full property form with amenities, pricing, house rules |
 | Cloudinary Upload | Direct browser-to-cloud image upload (up to 5 photos) |
 | Admin Approval | Properties go through PENDING → APPROVED/REJECTED workflow |
@@ -89,6 +191,7 @@
 ### ⭐ Reviews & Ratings
 | Feature | Detail |
 |---|---|
+| **📊 AI Review Summary** | **One-sentence summary of all reviews (auto-generated daily)** |
 | 6-category Rating | Cleanliness · Communication · Check-in · Location · Value · Accuracy |
 | Verified Reviews | Only guests with completed bookings can review |
 | Auto Rating Update | Property avg rating recalculated on every new review |
@@ -132,6 +235,8 @@
 ### 🔍 Search & Discovery
 | Feature | Detail |
 |---|---|
+| **🔍 Natural Language Search** | **Search like you talk: "romantic beachfront villa for honeymoon"** |
+| **🎯 Personalized Recommendations** | **AI-powered suggestions based on your booking history** |
 | Advanced Filters | City · dates · guests · price range · property type · category |
 | URL-synced State | Shareable search URLs with all filters encoded |
 | Recently Viewed | Last 6 viewed properties shown on home page |
@@ -179,22 +284,22 @@
 │  │                    Service Layer                        │    │
 │  │  AuthService · BookingService · PropertyService         │    │
 │  │  ReviewService · NotificationService · EmailService     │    │
-│  │  MessageService                                         │    │
+│  │  MessageService · 🤖 GeminiAIService                    │    │
 │  └────────────────────────┬───────────────────────────────┘    │
 │  ┌────────────────────────▼───────────────────────────────┐    │
 │  │              Spring Data JPA Repositories               │    │
 │  └────────────────────────┬───────────────────────────────┘    │
 │  ┌──────────────┐  ┌──────▼──────────┐  ┌──────────────┐      │
 │  │  JWT Filter  │  │  PostgreSQL      │  │ JavaMail     │      │
-│  │  + Security  │  │  + Flyway V1-V4  │  │ Gmail SMTP   │      │
+│  │  + Security  │  │  + Flyway V1-V6  │  │ Gmail SMTP   │      │
 │  └──────────────┘  └─────────────────┘  └──────────────┘      │
-└─────────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-              ┌────────────────────────┐
-              │      Cloudinary CDN    │
-              │   (Property Images)    │
-              └────────────────────────┘
+└─────────────────────────────────────────┬───────────────────────┘
+                           │               │
+                           ▼               ▼
+              ┌────────────────────────┐  ┌────────────────────┐
+              │   Cloudinary CDN       │  │  Google Gemini AI  │
+              │  (Property Images)     │  │  (gemini-2.5-flash)│
+              └────────────────────────┘  └────────────────────┘
 ```
 
 ---
@@ -206,13 +311,14 @@
 |---|---|---|
 | Java | 21 | Language (Virtual Threads enabled) |
 | Spring Boot | 3.2.0 | Application framework |
+| **Google Gemini AI** | **2.5-flash** | **AI-powered features (descriptions, pricing, search, summaries)** |
 | Spring Security | 6.2 | Authentication & authorization |
 | Spring Data JPA | 3.2 | Database ORM |
 | Spring WebSocket | 3.2 | Real-time notifications + chat |
 | Spring Mail | 3.2 | Email via Gmail SMTP |
 | SpringDoc OpenAPI | 2.3.0 | Swagger UI at `/swagger-ui/index.html` |
 | PostgreSQL | 16 | Primary database |
-| Flyway | 9 | Database migrations (V1→V4) |
+| Flyway | 9 | Database migrations (V1→V6) |
 | jjwt | 0.12.3 | JWT token generation & validation |
 | Lombok | Latest | Boilerplate reduction |
 | BCrypt | — | Password hashing (strength 12) |
@@ -308,9 +414,21 @@ MAIL_FROM=StayFinder <noreply@stayfinder.com>
 
 # Frontend URL (for password reset emails)
 FRONTEND_URL=https://your-frontend-url.onrender.com
+
+# Google Gemini AI (Required for AI features)
+GEMINI_API_KEY=your-gemini-api-key-here
+GEMINI_ENABLED=true
 ```
 
 > ⚠️ **Never commit `.env` to git.** It is listed in `.gitignore`.
+
+### 🔑 Getting a Gemini API Key
+
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Sign in with your Google account
+3. Click "Create API Key"
+4. Copy the key and add it to your `.env` file
+5. **Free Tier**: 20 requests/day · **Paid Tier**: ~$0.00015 per 1K characters
 
 ---
 
@@ -337,6 +455,10 @@ FRONTEND_URL=https://your-frontend-url.onrender.com
 | `POST` | `/api/v1/host/properties` | ✅ HOST | Create listing |
 | `GET` | `/api/v1/host/properties` | ✅ HOST | My listings |
 | `PUT` | `/api/v1/host/properties/{id}/availability` | ✅ HOST | Update availability |
+| **`POST`** | **`/api/v1/host/properties/generate-description`** | **✅ HOST** | **🤖 AI: Generate property description** |
+| **`GET`** | **`/api/v1/host/properties/{id}/price-recommendation`** | **✅ HOST** | **🤖 AI: Get smart price recommendation** |
+| **`POST`** | **`/api/v1/properties/interpret-search`** | **❌** | **🤖 AI: Interpret natural language search** |
+| **`GET`** | **`/api/v1/properties/recommendations`** | **✅** | **🤖 AI: Get personalized recommendations** |
 
 ### Bookings
 | Method | Endpoint | Auth | Description |
@@ -369,6 +491,7 @@ FRONTEND_URL=https://your-frontend-url.onrender.com
 | `PATCH` | `/api/v1/admin/properties/{id}/reject` | ✅ ADMIN | Reject property |
 | `DELETE` | `/api/v1/admin/properties/{id}` | ✅ ADMIN | Delete property |
 | `GET` | `/api/v1/admin/bookings` | ✅ ADMIN | All bookings |
+| **`POST`** | **`/api/v1/admin/properties/generate-review-summaries`** | **✅ ADMIN** | **🤖 AI: Generate review summaries (manual trigger)** |
 
 > 📖 Full interactive docs at `http://localhost:8080/swagger-ui/index.html`
 
@@ -381,10 +504,11 @@ stayfinder/
 ├── backend/src/main/java/com/stayfinder/
 │   ├── config/          # Security, JWT, WebSocket, Swagger, logging
 │   ├── controller/      # Auth, Property, Booking, Review, Message, Notification
-│   ├── service/         # Business logic + email templates
+│   ├── service/         # Business logic + email templates + 🤖 GeminiAIService
 │   ├── entity/          # JPA entities
 │   ├── dto/             # Request/Response DTOs
 │   ├── repository/      # Spring Data JPA interfaces
+│   ├── scheduler/       # BookingScheduler + ReviewSummaryScheduler (AI)
 │   └── exception/       # Global error handler
 ├── backend/src/test/java/com/stayfinder/service/
 │   ├── AuthServiceTest.java      # 8 unit tests
@@ -393,7 +517,9 @@ stayfinder/
 │   ├── V1__init.sql
 │   ├── V2__add_property_coordinates.sql
 │   ├── V3__add_messages_table.sql
-│   └── V4__add_password_reset_tokens.sql
+│   ├── V4__add_password_reset_tokens.sql
+│   ├── V5__add_email_verification.sql
+│   └── V6__add_review_summary.sql        # AI review summaries
 ├── frontend/
 │   ├── manifest.json / sw.js     # PWA
 │   ├── index.html
@@ -424,6 +550,39 @@ stayfinder/
 - No payment gateway (Stripe/Razorpay integration planned)
 - Email requires Gmail App Password setup
 - Map view requires properties to have lat/lng coordinates
+- AI features require Gemini API key (free tier: 20 requests/day)
+
+---
+
+## 🎯 Why StayFinder Stands Out
+
+### 🤖 AI-Powered Intelligence
+Unlike traditional rental platforms, StayFinder leverages cutting-edge AI to:
+- **Save hosts time** with automated content generation
+- **Optimize revenue** with smart pricing recommendations
+- **Improve discovery** with natural language search
+- **Enhance decisions** with review summaries
+
+### 🏆 Competitive Advantages
+
+| Feature | StayFinder | Airbnb | OYO | Booking.com |
+|---------|-----------|--------|-----|-------------|
+| AI Property Descriptions | ✅ Free | ❌ | ❌ | ❌ |
+| AI Smart Pricing | ✅ Free | ✅ Paid | ❌ | ❌ |
+| Natural Language Search | ✅ | ❌ | ❌ | ❌ |
+| Personalized AI Recs | ✅ | ✅ | ❌ | ✅ |
+| AI Review Summaries | ✅ | ❌ | ❌ | ❌ |
+| Real-time Chat | ✅ | ✅ | ❌ | ✅ |
+| PWA Support | ✅ | ✅ | ❌ | ❌ |
+| Open Source | ✅ | ❌ | ❌ | ❌ |
+
+### 📊 Technical Excellence
+- **Modern Stack**: Java 21 with Virtual Threads, Spring Boot 3.2
+- **Security First**: JWT auth, BCrypt, XSS protection, CORS configuration
+- **Real-time**: WebSocket notifications and chat
+- **Scalable**: Docker-ready, stateless architecture
+- **Well-tested**: Unit tests with JUnit 5 + Mockito
+- **Production-ready**: Error handling, logging, monitoring
 
 ---
 

@@ -192,7 +192,12 @@
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
         <div class="form-group">
           <label class="form-label">Price/night (₹)</label>
-          <input type="number" class="form-input" id="al-price" min="100" placeholder="2500" required>
+          <div style="display:flex;gap:8px;align-items:flex-end">
+            <input type="number" class="form-input" id="al-price" min="100" placeholder="2500" required style="flex:1">
+            <button type="button" class="btn-ai-price" id="btn-smart-price" title="Get AI price recommendation">
+              💰 Smart Price
+            </button>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Max guests</label>
@@ -207,6 +212,18 @@
           <input type="number" class="form-input" id="al-bathrooms" min="1" value="1">
         </div>
       </div>
+
+      <!-- Smart Price Recommendation Panel -->
+      <div id="price-recommendation-panel" class="price-rec-panel hidden">
+        <div class="price-rec-header">
+          <div class="price-rec-title">💰 Smart Price Recommendation</div>
+          <button class="price-rec-close" onclick="Host.closePriceRecommendation()">✕</button>
+        </div>
+        <div class="price-rec-content" id="price-rec-content">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
       <div class="form-group">
         <label class="form-label">Beds</label>
         <input type="number" class="form-input" id="al-beds" min="1" value="1" style="width:120px">
