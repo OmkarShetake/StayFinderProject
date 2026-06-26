@@ -168,7 +168,7 @@ public class GeminiAIService {
             : "basic amenities";
 
         return String.format("""
-            Write a compelling, professional property description for a rental listing.
+            Write a compelling, professional property description for a vacation rental listing.
             
             Property Details:
             - Type: %s
@@ -179,14 +179,18 @@ public class GeminiAIService {
             - Amenities: %s
             
             Requirements:
-            - Write 3-4 sentences (80-120 words)
-            - Be enthusiastic but professional
-            - Highlight the location and key amenities
-            - Make it appealing to travelers
-            - Don't use markdown or special formatting
-            - Don't include price or booking information
+            - Write 5-6 sentences (minimum 150 words, maximum 200 words)
+            - Start with an exciting hook about the property or location
+            - Describe the space and what makes it special
+            - Highlight key amenities and features guests will love
+            - Mention the neighborhood or nearby attractions
+            - End with who this property is perfect for (families, couples, business travelers, etc.)
+            - Be enthusiastic, warm, and inviting
+            - Do NOT use markdown, bullet points, or special formatting
+            - Do NOT include price or booking information
+            - Write in flowing paragraph form only
             
-            Write only the description, nothing else.
+            Write only the description paragraph, nothing else.
             """,
             propertyType, city, state, bedrooms, bathrooms, maxGuests, amenitiesList
         );
@@ -348,7 +352,7 @@ public class GeminiAIService {
         String season = getSeason(currentMonth);
 
         return String.format("""
-            As a pricing expert for vacation rentals in India, provide a smart price recommendation.
+            You are a vacation rental pricing expert in India. Provide a smart price recommendation.
             
             Property Details:
             - Location: %s, %s
@@ -361,36 +365,19 @@ public class GeminiAIService {
             - Average Price in Area: %s per night
             - Current Season: %s
             
-            Analyze and provide pricing recommendation considering:
-            1. Location demand (tourist destination, business hub, etc.)
-            2. Property features and amenities
-            3. Seasonal factors (peak/off-peak)
-            4. Market comparison (area average)
-            5. Property capacity and type
-            6. Upcoming festivals/events in the region
+            Consider: location demand, amenities, seasonal factors, market comparison, capacity.
+            All prices must be realistic Indian Rupee amounts (e.g., 1500 to 15000 range for most properties).
             
-            Provide your response in this EXACT format:
-            
-            RECOMMENDED_PRICE: [single number only, e.g., 3500]
-            WEEKEND_PRICE: [single number only, e.g., 4200]
-            MIN_PRICE: [single number only, e.g., 2800]
-            MAX_PRICE: [single number only, e.g., 5000]
+            Respond in this EXACT format with no extra text before or after:
+            RECOMMENDED_PRICE: [number only, no symbols]
+            WEEKEND_PRICE: [number only, no symbols]
+            MIN_PRICE: [number only, no symbols]
+            MAX_PRICE: [number only, no symbols]
             CONFIDENCE: [HIGH, MEDIUM, or LOW]
-            REASONING: [2-3 sentences explaining the recommendation]
-            TIPS: [2-3 actionable tips to increase bookings, separated by semicolons]
-            
-            Example:
-            RECOMMENDED_PRICE: 3500
-            WEEKEND_PRICE: 4200
-            MIN_PRICE: 2800
-            MAX_PRICE: 5000
-            CONFIDENCE: HIGH
-            REASONING: Based on your property's location in a popular tourist area with premium amenities, the recommended price is competitive yet profitable. The area average is ₹3200, and your additional amenities justify a slight premium.
-            TIPS: Add professional photos to increase bookings by 40%%; Offer weekly discounts to attract longer stays; Highlight unique amenities in your description
-            
-            Now provide the recommendation in the exact format above.
+            REASONING: [2 sentences max explaining the recommendation]
+            TIPS: [tip 1]; [tip 2]; [tip 3]
             """,
-            city, state, propertyType, category, bedrooms, bathrooms, 
+            city, state, propertyType, category, bedrooms, bathrooms,
             maxGuests, amenitiesList, currentPriceStr, avgPriceStr, season
         );
     }
@@ -547,7 +534,7 @@ public class GeminiAIService {
                 ),
                 "generationConfig", Map.of(
                     "temperature", 0.7,
-                    "maxOutputTokens", 200,
+                    "maxOutputTokens", 600,
                     "topP", 0.8,
                     "topK", 40
                 )
