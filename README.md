@@ -1,15 +1,17 @@
 <div align="center">
 
 <img src="https://img.shields.io/badge/Java-21-FF6B35?style=for-the-badge&logo=openjdk&logoColor=white"/>
-<img src="https://img.shields.io/badge/Spring_Boot-3.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
+<img src="https://img.shields.io/badge/Spring_Boot-3.2.0-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
 <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
-<img src="https://img.shields.io/badge/Google_Gemini_AI-2.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white"/>
+<img src="https://img.shields.io/badge/Gemini_AI-2.5_Flash_(REST)-4285F4?style=for-the-badge&logo=google&logoColor=white"/>
 <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
-<img src="https://img.shields.io/badge/WebSocket-STOMP-FF385C?style=for-the-badge&logo=socket.io&logoColor=white"/>
+<img src="https://img.shields.io/badge/WebSocket-STOMP_1.2-FF385C?style=for-the-badge&logo=socket.io&logoColor=white"/>
 <img src="https://img.shields.io/badge/Cloudinary-Image_Upload-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white"/>
-<img src="https://img.shields.io/badge/Leaflet.js-Map_View-199900?style=for-the-badge&logo=leaflet&logoColor=white"/>
+<img src="https://img.shields.io/badge/Leaflet.js-1.9.4-199900?style=for-the-badge&logo=leaflet&logoColor=white"/>
 <img src="https://img.shields.io/badge/PWA-Installable-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white"/>
-<img src="https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black"/>
+<img src="https://img.shields.io/badge/SpringDoc_OpenAPI-2.3.0-85EA2D?style=for-the-badge&logo=swagger&logoColor=black"/>
+<img src="https://img.shields.io/badge/jjwt-0.12.3-yellow?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/Flyway-9-CC0200?style=for-the-badge&logo=flyway&logoColor=white"/>
 <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge"/>
 
 <br/><br/>
@@ -311,27 +313,32 @@ Tips:
 |---|---|---|
 | Java | 21 | Language (Virtual Threads enabled) |
 | Spring Boot | 3.2.0 | Application framework |
-| **Google Gemini AI** | **2.5-flash** | **AI-powered features (descriptions, pricing, search, summaries)** |
-| Spring Security | 6.2 | Authentication & authorization |
-| Spring Data JPA | 3.2 | Database ORM |
-| Spring WebSocket | 3.2 | Real-time notifications + chat |
-| Spring Mail | 3.2 | Email via Gmail SMTP |
+| Spring Web (MVC) | 3.2.0 | REST API controllers |
+| Spring Security | 6.2 | JWT authentication & role-based access |
+| Spring Data JPA | 3.2.0 | Database ORM with repositories |
+| Spring WebSocket | 3.2.0 | Real-time notifications + host/guest chat |
+| Spring Mail | 3.2.0 | Transactional email via Gmail SMTP |
+| Spring Validation | 3.2.0 | Request body validation (`@Valid`) |
+| Spring Actuator | 3.2.0 | Health check & metrics endpoints |
 | SpringDoc OpenAPI | 2.3.0 | Swagger UI at `/swagger-ui/index.html` |
-| PostgreSQL | 16 | Primary database |
-| Flyway | 9 | Database migrations (V1→V6) |
+| **Google Gemini AI** | **gemini-2.5-flash** | **AI features via REST (`RestTemplate` + API key)** |
+| PostgreSQL | 16 | Primary relational database |
+| Flyway | 9 | Database migrations (V1 → V6) |
 | jjwt | 0.12.3 | JWT token generation & validation |
-| Lombok | Latest | Boilerplate reduction |
-| BCrypt | — | Password hashing (strength 12) |
-| JUnit 5 + Mockito | — | Unit tests for AuthService & BookingService |
+| Lombok | Latest | Boilerplate reduction (`@Data`, `@Builder`, etc.) |
+| BCrypt | (Spring Security) | Password hashing (strength 12) |
+| JUnit 5 + Mockito | (Spring Boot Test) | Unit tests for AuthService & BookingService |
 
 ### Frontend
-| Technology | Purpose |
-|---|---|
-| Vanilla JS (ES2022) | No framework — clean, fast, zero dependencies |
-| SockJS + STOMP.js | WebSocket client for real-time notifications & chat |
-| Cloudinary JS API | Direct browser image upload |
-| Leaflet.js 1.9.4 | Interactive map view with property price pins |
-| CSS Variables | Consistent theming + dark mode support |
+| Technology | Version | Purpose |
+|---|---|---|
+| Vanilla JS (ES2022) | — | No framework — clean, fast, zero build step |
+| SockJS | 1.6.1 | WebSocket transport fallback |
+| STOMP.js | 2.3.3 | WebSocket messaging protocol client |
+| Cloudinary JS API | — | Direct browser-to-cloud image upload |
+| Leaflet.js | 1.9.4 | Interactive map view with property price pins |
+| CSS Variables | — | Consistent theming + full dark mode support |
+| PWA (manifest + sw.js) | — | Installable app with offline cache |
 
 ### Infrastructure
 | Technology | Purpose |
@@ -519,13 +526,53 @@ stayfinder/
 │   ├── V3__add_messages_table.sql
 │   ├── V4__add_password_reset_tokens.sql
 │   ├── V5__add_email_verification.sql
-│   └── V6__add_review_summary.sql        # AI review summaries
+│   └── V6__add_review_summary.sql
 ├── frontend/
-│   ├── manifest.json / sw.js     # PWA
-│   ├── index.html
-│   ├── pages/                    # search, property, trips, wishlist, host, admin, chat, profile, password reset
-│   ├── js/                       # api, auth, utils, search, property, host, websocket
-│   └── css/                      # global, nav, search, property, host, auth
+│   ├── index.html                # Homepage
+│   ├── manifest.json             # PWA manifest
+│   ├── sw.js                     # Service worker (offline support)
+│   ├── pages/
+│   │   ├── search.html           # Search with filters + map
+│   │   ├── property.html         # Property detail + booking calendar
+│   │   ├── host.html             # Host dashboard
+│   │   ├── admin.html            # Admin moderation panel
+│   │   ├── trips.html            # Guest bookings
+│   │   ├── wishlist.html         # Saved properties
+│   │   ├── chat.html             # Host/guest messaging
+│   │   ├── profile.html          # User profile
+│   │   ├── forgot-password.html  # Password reset request
+│   │   ├── reset-password.html   # Password reset form
+│   │   └── verify-email.html     # Email verification
+│   ├── css/
+│   │   ├── global.css            # CSS variables, resets, shared components
+│   │   ├── nav.css               # Navbar + dropdown
+│   │   ├── auth.css              # Login/register modals
+│   │   ├── index.css             # Homepage: footer, inspiration, autocomplete
+│   │   ├── search.css            # Search layout, filters, AI banner, map pins
+│   │   ├── property.css          # Property detail, calendar, booking card
+│   │   ├── host.css              # Host dashboard, listing cards
+│   │   ├── chat.css              # Chat UI and message bubbles
+│   │   ├── admin.css             # Admin cards and tabs
+│   │   ├── trips.css             # Trip cards and tabs
+│   │   └── verify-email.css      # Email verification page
+│   └── js/
+│       ├── utils.js              # Shared utilities (XSS escaping, formatting, toast)
+│       ├── api.js                # All API calls to the backend
+│       ├── auth.js               # Auth state, login/register, token refresh
+│       ├── websocket.js          # SockJS + STOMP wrapper
+│       ├── search.js             # Homepage property grid + infinite scroll
+│       ├── index.js              # Homepage: dark mode, notifications, autocomplete
+│       ├── search-page.js        # search.html: filters, map, AI search
+│       ├── property.js           # property.html: calendar, booking, reviews, lightbox
+│       ├── host.js               # host.html: dashboard, listings, Cloudinary upload, AI pricing
+│       ├── admin.js              # admin.html: property moderation, bookings
+│       ├── chat.js               # chat.html: messaging + WebSocket
+│       ├── trips.js              # trips.html: bookings, modify, review
+│       ├── profile.js            # profile.html: profile editing
+│       ├── wishlist.js           # wishlist.html: saved properties
+│       ├── forgot-password.js    # forgot-password.html
+│       ├── reset-password.js     # reset-password.html
+│       └── verify-email.js       # verify-email.html
 ├── nginx.conf
 ├── docker-compose.yml
 └── .env.example

@@ -159,8 +159,6 @@
           <div class="booking-price-big" id="bk-price">₹— <span>night</span></div>
           <div class="booking-card-rating" id="bk-rating"></div>
         </div>
-
-        <!-- Date range -->
         <div class="date-range-box">
           <div class="date-range-row">
             <div class="date-cell">
@@ -173,8 +171,6 @@
             </div>
           </div>
         </div>
-
-        <!-- Calendar -->
         <div class="cal">
           <div class="cal-hdr">
             <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
@@ -184,8 +180,6 @@
           <div class="cal-days-hdr" id="cal-days-hdr"></div>
           <div class="cal-days" id="cal-days"></div>
         </div>
-
-        <!-- Guests -->
         <div class="guests-box">
           <div>
             <div class="guests-box-lbl">Guests</div>
@@ -197,11 +191,8 @@
             <button class="guest-ctrl-btn" id="btn-guest-plus">+</button>
           </div>
         </div>
-
         <button class="reserve-btn" id="reserve-btn">Reserve</button>
         <div class="reserve-note">You won't be charged yet</div>
-
-        <!-- Price breakdown -->
         <div class="price-breakdown hidden" id="price-breakdown">
           <div class="price-row"><span class="underline" id="pb-label">—</span><span id="pb-base">—</span></div>
           <div class="price-row"><span>Cleaning fee</span><span id="pb-cleaning">—</span></div>
@@ -211,7 +202,6 @@
         <div id="pb-placeholder" style="text-align:center;font-size:13px;color:#717171;padding:16px 0">
           Select dates to see the full price
         </div>
-
       </div>
     </div>
 
@@ -262,43 +252,5 @@
 <script src="../js/auth.js"></script>
 <script src="../js/websocket.js"></script>
 <script src="../js/property.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Fix nav logo — use dynamic root path same as auth.js
-    document.getElementById('nav-logo').addEventListener('click', () => {
-      const path = window.location.pathname;
-      const marker = '/frontend/';
-      const idx = path.indexOf(marker);
-      const root = idx !== -1
-              ? path.substring(0, idx + marker.length)
-              : path.replace(/\/[^/]*$/, '/');
-      window.location.href = root + 'index.html';
-    });
-
-    // Share button — use Web Share API with clipboard fallback
-    document.getElementById('share-btn').addEventListener('click', async () => {
-      const title = document.getElementById('detail-title')?.textContent || 'StayFinder Property';
-      const url   = window.location.href;
-      if (navigator.share) {
-        try {
-          await navigator.share({ title, url });
-        } catch (e) {
-          // User cancelled share — do nothing
-        }
-      } else {
-        // Fallback: copy link to clipboard
-        try {
-          await navigator.clipboard.writeText(url);
-          Utils.toast('Link copied to clipboard! 🔗');
-        } catch {
-          Utils.toast('Copy this link: ' + url);
-        }
-      }
-    });
-
-    // Show login form by default in auth modal
-    document.getElementById('login-form').classList.remove('hidden');
-  });
-</script>
 </body>
 </html>

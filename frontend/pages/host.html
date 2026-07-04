@@ -23,8 +23,6 @@
       <div class="nav-ham">☰</div>
       <div class="nav-avatar" id="nav-avatar">👤</div>
       <div class="notif-dot hidden"></div>
-
-      <!-- Dropdown -->
       <div class="nav-dropdown" id="nav-dropdown">
         <div class="nav-dropdown-user hidden" id="nav-dropdown-user">
           <div class="nav-dropdown-avatar" id="nav-dropdown-avatar"></div>
@@ -87,14 +85,12 @@
     <div id="section-overview" class="host-section-page">
       <div class="host-welcome" id="host-welcome">Welcome back 👋</div>
       <div class="host-welcome-sub">Here's what's happening with your properties</div>
-
       <div class="stat-grid">
         <div class="stat-card"><div class="stat-card-lbl">Total earnings</div><div class="stat-card-val green" id="stat-earnings">₹0</div></div>
         <div class="stat-card"><div class="stat-card-lbl">Total bookings</div><div class="stat-card-val" id="stat-bookings">0</div></div>
         <div class="stat-card"><div class="stat-card-lbl">Your listings</div><div class="stat-card-val" id="stat-listings">0</div></div>
         <div class="stat-card"><div class="stat-card-lbl">Pending requests</div><div class="stat-card-val red" id="stat-pending">0</div></div>
       </div>
-
       <div class="host-section">
         <div class="host-section-hdr">
           <h3>Recent bookings</h3>
@@ -233,32 +229,17 @@
           Photos
           <span style="font-weight:400;color:#717171">(up to 5 images, first is cover photo)</span>
         </label>
-
-        <!-- Image preview area -->
         <div id="al-image-preview"
-             style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;
-                    min-height:40px;align-items:center">
-          <p style="color:var(--text-3);font-size:13px;text-align:center;padding:12px 0">
-            No photos uploaded yet
-          </p>
+             style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;min-height:40px;align-items:center">
+          <p style="color:var(--text-3);font-size:13px;text-align:center;padding:12px 0">No photos uploaded yet</p>
         </div>
-
-        <!-- Upload button -->
         <label style="display:inline-block;cursor:pointer">
-          <input type="file"
-                 id="al-image-input"
-                 accept="image/*"
-                 multiple
-                 style="display:none">
-          <span id="al-upload-btn"
-                class="btn btn-outline btn-sm"
-                style="display:inline-flex;align-items:center;gap:6px">
+          <input type="file" id="al-image-input" accept="image/*" multiple style="display:none">
+          <span id="al-upload-btn" class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:6px">
             📷 Add photos
           </span>
         </label>
-        <span style="font-size:12px;color:var(--text-3);margin-left:8px">
-          JPG, PNG, WEBP supported
-        </span>
+        <span style="font-size:12px;color:var(--text-3);margin-left:8px">JPG, PNG, WEBP supported</span>
       </div>
       <div class="form-group">
         <label class="form-label">Amenities <span style="font-weight:400;color:#717171">(select all that apply)</span></label>
@@ -295,38 +276,5 @@
 <script src="../js/auth.js"></script>
 <script src="../js/websocket.js"></script>
 <script src="../js/host.js"></script>
-<script>
-  function _rootPath() {
-    const path   = window.location.pathname;
-    const marker = '/frontend/';
-    const idx    = path.indexOf(marker);
-    if (idx !== -1) return path.substring(0, idx + marker.length);
-    if (path.includes('/pages/')) {
-      return path.substring(0, path.indexOf('/pages/') + 1);
-    }
-    return '/';
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    // Nav logo
-    document.getElementById('nav-logo').addEventListener('click', () => {
-      window.location.href = _rootPath() + 'index.html';
-    });
-    // Explore button
-    document.getElementById('btn-explore').addEventListener('click', () => {
-      window.location.href = _rootPath() + 'index.html';
-    });
-
-    // Render full dropdown
-    Auth.renderNavUser();
-
-    // Set welcome message
-    const user = Auth.getUser();
-    if (user) {
-      document.getElementById('host-welcome').textContent =
-              `Welcome back, ${user.fullName.split(' ')[0]} 👋`;
-    }
-  });
-</script>
 </body>
 </html>

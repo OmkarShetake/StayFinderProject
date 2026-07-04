@@ -1,0 +1,51 @@
+.verify-container {
+  max-width: 500px;
+  margin: 80px auto;
+  padding: 40px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+}
+.verify-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+.verify-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.verify-message {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+.verify-btn {
+  padding: 14px 32px;
+  background: var(--red);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.verify-btn:hover { background: var(--red-dark); }
+.verify-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.resend-link {
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.resend-link button {
+  background: none;
+  border: none;
+  color: var(--red);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
