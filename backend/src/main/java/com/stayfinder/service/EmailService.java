@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
+import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+
+import java.io.UnsupportedEncodingException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,26 +23,29 @@ public class EmailService {
     @Value("${stayfinder.mail.from}")
     private String fromAddress;
 
+    @Value("${stayfinder.mail.from-name:StayFinder}")
+    private String fromName;
+
     @Value("${stayfinder.mail.enabled:true}")
     private boolean mailEnabled;
 
     /* ── Generic send ────────────────────────────────────────────── */
-    @Async
     public void send(String to, String subject, String htmlBody) {
         if (!mailEnabled) {
             log.debug("Email disabled — skipping send to {}: {}", to, subject);
             return;
         }
         try {
-            MimeMessage msg    = mailSender.createMimeMessage();
+            MimeMessage msg     = mailSender.createMimeMessage();
             MimeMessageHelper h = new MimeMessageHelper(msg, true, "UTF-8");
-            h.setFrom(fromAddress);
+            // Use InternetAddress to safely set display name + address
+            h.setFrom(new InternetAddress(fromAddress, fromName, "UTF-8"));
             h.setTo(to);
             h.setSubject(subject);
-            h.setText(htmlBody, true); // true = HTML
+            h.setText(htmlBody, true);
             mailSender.send(msg);
-            log.debug("Email sent to {}: {}", to, subject);
-        } catch (MessagingException e) {
+            log.info("Email sent to {}: {}", to, subject);
+        } catch (MessagingException | UnsupportedEncodingException e) {
             log.error("Failed to send email to {}: {}", to, e.getMessage());
         }
     }
@@ -86,7 +91,7 @@ public class EmailService {
             guestName,
             """
             <p>Great news! Your stay has been confirmed.</p>
-            <table style="width:100%;border-collapse:collapse;margin:20px 0">
+            <table style="width:100%%;border-collapse:collapse;margin:20px 0">
               <tr><td style="padding:10px;border-bottom:1px solid #eee;color:#717171">Property</td>
                   <td style="padding:10px;border-bottom:1px solid #eee;font-weight:600">%s, %s</td></tr>
               <tr><td style="padding:10px;border-bottom:1px solid #eee;color:#717171">Check in</td>
@@ -137,7 +142,7 @@ public class EmailService {
             guestName,
             """
             <p>Your booking for <strong>%s</strong> has been updated.</p>
-            <table style="width:100%;border-collapse:collapse;margin:20px 0">
+            <table style="width:100%%;border-collapse:collapse;margin:20px 0">
               <tr><td style="padding:10px;border-bottom:1px solid #eee;color:#717171">New check in</td>
                   <td style="padding:10px;border-bottom:1px solid #eee;font-weight:600">%s</td></tr>
               <tr><td style="padding:10px;border-bottom:1px solid #eee;color:#717171">New check out</td>

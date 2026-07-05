@@ -5,6 +5,8 @@ import com.stayfinder.entity.*;
 import com.stayfinder.entity.Property.PropertyStatus;
 import com.stayfinder.exception.StayFinderException;
 import com.stayfinder.repository.*;
+import com.stayfinder.kafka.NotificationEvent;
+import com.stayfinder.kafka.NotificationEventProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ public class PropertyService {
     private final ReviewRepository reviewRepository;
     private final BookingRepository bookingRepository;
     private final NotificationService notificationService;
+    private final NotificationEventProducer kafkaProducer;
     private final GeminiAIService geminiAIService;
 
     @Transactional
@@ -166,10 +169,19 @@ public class PropertyService {
                 .orElseThrow(() -> new StayFinderException("Property not found"));
         p.setStatus(PropertyStatus.APPROVED);
         propertyRepository.save(p);
-        notificationService.createAndSend(p.getHost().getId(),
-                "Your listing is approved! 🎉",
-                "'" + p.getTitle() + "' is now live on StayFinder.",
-                "PROPERTY_APPROVED", propertyId);
+
+        kafkaProducer.publish(NotificationEvent.builder()
+                .userId(p.getHost().getId())
+                .userEmail(p.getHost().getEmail())
+                .userFullName(p.getHost().getFullName())
+                .title("Your listing is approved! 🎉")
+                .message("'" + p.getTitle() + "' is now live on StayFinder.")
+                .type("PROPERTY_APPROVED")
+                .referenceId(propertyId)
+                .propertyTitle(p.getTitle())
+                .build());
+
+        log.info("Property {} approved", propertyId);
         return PropertyResponse.from(p);
     }
 
@@ -179,35 +191,42 @@ public class PropertyService {
                 .orElseThrow(() -> new StayFinderException("Property not found"));
         p.setStatus(PropertyStatus.REJECTED);
         propertyRepository.save(p);
-        notificationService.createAndSend(p.getHost().getId(),
-                "Your listing was rejected",
-                "'" + p.getTitle() + "' was not approved. Please review our guidelines and resubmit.",
-                "PROPERTY_REJECTED", propertyId);
+
+        kafkaProducer.publish(NotificationEvent.builder()
+                .userId(p.getHost().getId())
+                .userEmail(p.getHost().getEmail())
+                .userFullName(p.getHost().getFullName())
+                .title("Your listing was not approved")
+                .message("'" + p.getTitle() + "' was not approved. Please review our guidelines and resubmit.")
+                .type("PROPERTY_REJECTED")
+                .referenceId(propertyId)
+                .propertyTitle(p.getTitle())
+                .build());
+
         log.info("Property {} rejected", propertyId);
         return PropertyResponse.from(p);
     }
 
-    /* ── Admin: permanently delete a property ───────────────────── */
     @Transactional
     public void deleteProperty(Long propertyId) {
         Property p = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new StayFinderException("Property not found"));
 
-        // Notify host before deletion
-        notificationService.createAndSend(p.getHost().getId(),
-                "Your listing has been removed",
-                "'" + p.getTitle() + "' has been removed by an administrator.",
-                "PROPERTY_DELETED", propertyId);
+        // Notify host via Kafka before deleting
+        kafkaProducer.publish(NotificationEvent.builder()
+                .userId(p.getHost().getId())
+                .userEmail(p.getHost().getEmail())
+                .userFullName(p.getHost().getFullName())
+                .title("Your listing has been removed")
+                .message("'" + p.getTitle() + "' has been removed by an administrator.")
+                .type("PROPERTY_DELETED")
+                .referenceId(propertyId)
+                .propertyTitle(p.getTitle())
+                .build());
 
-        // Delete availability records first (FK constraint)
         availabilityRepository.deleteByPropertyId(propertyId);
-
-        // Delete wishlists referencing this property
         wishlistRepository.deleteByPropertyId(propertyId);
-
-        // Delete the property (cascades to images, bookings, reviews via DB cascade)
         propertyRepository.deleteById(propertyId);
-
         log.info("Property {} deleted by admin", propertyId);
     }
 

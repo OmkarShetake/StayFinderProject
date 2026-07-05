@@ -3,6 +3,8 @@ package com.stayfinder.service;
 import com.stayfinder.dto.ReviewDTOs.*;
 import com.stayfinder.entity.*;
 import com.stayfinder.exception.StayFinderException;
+import com.stayfinder.kafka.NotificationEvent;
+import com.stayfinder.kafka.NotificationEventProducer;
 import com.stayfinder.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,11 +19,12 @@ import java.math.RoundingMode;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    private final ReviewRepository reviewRepository;
-    private final BookingRepository bookingRepository;
-    private final PropertyRepository propertyRepository;
-    private final PropertyService propertyService;
+    private final ReviewRepository    reviewRepository;
+    private final BookingRepository   bookingRepository;
+    private final PropertyRepository  propertyRepository;
+    private final PropertyService     propertyService;
     private final NotificationService notificationService;
+    private final NotificationEventProducer kafkaProducer;
 
     @Transactional
     public ReviewResponse createReview(CreateReviewRequest req, Long guestId) {
@@ -60,12 +63,25 @@ public class ReviewService {
         reviewRepository.save(review);
         updatePropertyRating(booking.getProperty().getId());
 
-        notificationService.createAndSend(booking.getProperty().getHost().getId(),
-                "New review received ⭐",
-                booking.getGuest().getFullName() + " left a " + overall + "-star review for " +
-                        booking.getProperty().getTitle(),
-                "NEW_REVIEW", review.getId());
+        // Publish Kafka event with full review context so the consumer
+        // can render the rich "new review" email for the host
+        User host = booking.getProperty().getHost();
+        NotificationEvent event = NotificationEvent.builder()
+                .userId(host.getId())
+                .userEmail(host.getEmail())
+                .userFullName(host.getFullName())
+                .title("New review received ⭐")
+                .message(booking.getGuest().getFullName() + " left a "
+                        + overall + "-star review for "
+                        + booking.getProperty().getTitle())
+                .type("NEW_REVIEW")
+                .referenceId(review.getId())
+                .propertyTitle(booking.getProperty().getTitle())
+                .guestName(booking.getGuest().getFullName())
+                .rating(overall.toPlainString())
+                .build();
 
+        kafkaProducer.publish(event);
         return ReviewResponse.from(review);
     }
 

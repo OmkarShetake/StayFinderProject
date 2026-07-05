@@ -1,9 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  }
-
   // Fix nav logo path
   document.getElementById('nav-logo')?.addEventListener('click', () => {
     const path = window.location.pathname;

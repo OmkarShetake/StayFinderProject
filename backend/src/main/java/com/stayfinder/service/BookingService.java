@@ -105,17 +105,26 @@ public class BookingService {
 
         bookingRepository.save(booking);
 
-        // Notify host
+        // Notify host / guest via Kafka
         if (property.isInstantBook()) {
+            // Host: simple notification
             notificationService.createAndSend(property.getHost().getId(),
                     "New booking confirmed! 🏠",
                     guest.getFullName() + " booked " + property.getTitle() +
                             " for " + nights + " nights.",
                     "BOOKING_CONFIRMED", booking.getId());
-            notificationService.createAndSend(guestId,
+
+            // Guest: rich notification with full booking details for the email template
+            notificationService.createAndSendBookingEvent(
+                    guestId,
                     "Booking confirmed! 🎉",
                     "Your stay at " + property.getTitle() + " is confirmed. Ref: " + booking.getReferenceId(),
-                    "BOOKING_CONFIRMED", booking.getId());
+                    "BOOKING_CONFIRMED", booking.getId(),
+                    property.getTitle(), property.getCity(),
+                    req.getCheckIn().toString(), req.getCheckOut().toString(),
+                    nights, req.getGuests(),
+                    "₹" + totalAmount.toPlainString(),
+                    booking.getReferenceId());
         } else {
             notificationService.createAndSend(property.getHost().getId(),
                     "New booking request 📩",
@@ -205,10 +214,16 @@ public class BookingService {
         }
         b.setStatus(BookingStatus.CONFIRMED);
         bookingRepository.save(b);
-        notificationService.createAndSend(b.getGuest().getId(),
+        notificationService.createAndSendBookingEvent(
+                b.getGuest().getId(),
                 "Booking confirmed! 🎉",
                 "Your request for " + b.getProperty().getTitle() + " has been accepted.",
-                "BOOKING_CONFIRMED", bookingId);
+                "BOOKING_CONFIRMED", bookingId,
+                b.getProperty().getTitle(), b.getProperty().getCity(),
+                b.getCheckIn().toString(), b.getCheckOut().toString(),
+                b.getNights(), b.getGuests(),
+                "₹" + b.getTotalAmount().toPlainString(),
+                b.getReferenceId());
         return BookingResponse.from(b);
     }
 
@@ -255,10 +270,28 @@ public class BookingService {
         }
         b.setStatus(BookingStatus.CANCELLED);
         bookingRepository.save(b);
-        notificationService.createAndSend(b.getProperty().getHost().getId(),
+
+        // Notify host via Kafka
+        notificationService.createAndSend(
+                b.getProperty().getHost().getId(),
                 "Booking cancelled",
-                b.getGuest().getFullName() + " cancelled their booking for " + b.getProperty().getTitle(),
+                b.getGuest().getFullName() + " cancelled their booking for "
+                        + b.getProperty().getTitle(),
                 "BOOKING_CANCELLED", bookingId);
+
+        // Notify guest via Kafka — rich email with property + reference details
+        notificationService.createAndSendBookingEvent(
+                b.getGuest().getId(),
+                "Your booking has been cancelled",
+                "Your booking for " + b.getProperty().getTitle() + " has been cancelled.",
+                "BOOKING_CANCELLED", bookingId,
+                b.getProperty().getTitle(), b.getProperty().getCity(),
+                b.getCheckIn().toString(), b.getCheckOut().toString(),
+                b.getNights(), b.getGuests(),
+                "₹" + b.getTotalAmount().toPlainString(),
+                b.getReferenceId());
+
+        log.info("Booking {} cancelled by guest {}", b.getReferenceId(), guestId);
         return BookingResponse.from(b);
     }
 
@@ -314,7 +347,7 @@ public class BookingService {
         b.setTotalAmount(totalAmount);
         bookingRepository.save(b);
 
-        // Notify host
+        // Notify host via Kafka
         notificationService.createAndSend(
                 b.getProperty().getHost().getId(),
                 "Booking dates changed 📅",
@@ -322,6 +355,18 @@ public class BookingService {
                         b.getProperty().getTitle() + " to " +
                         req.getCheckIn() + " → " + req.getCheckOut(),
                 "BOOKING_MODIFIED", bookingId);
+
+        // Notify guest with rich email via Kafka
+        notificationService.createAndSendBookingEvent(
+                b.getGuest().getId(),
+                "Your booking dates have been updated 📅",
+                "Your stay at " + b.getProperty().getTitle() + " has been updated.",
+                "BOOKING_MODIFIED", bookingId,
+                b.getProperty().getTitle(), b.getProperty().getCity(),
+                req.getCheckIn().toString(), req.getCheckOut().toString(),
+                nights, req.getGuests(),
+                "₹" + totalAmount.toPlainString(),
+                b.getReferenceId());
 
         log.info("Booking {} modified by guest {}", b.getReferenceId(), guestId);
         return BookingResponse.from(b);

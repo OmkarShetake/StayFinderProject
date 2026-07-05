@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  config:
+    import: "optional:file:.env[.properties]"
   application:
     name: stayfinder
 
@@ -10,9 +12,9 @@ spring:
       enabled: true
 
   datasource:
-    url:             ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/stayfinder_db}
-    username:        ${SPRING_DATASOURCE_USERNAME:postgres}
-    password:        ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url:               ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/stayfinder_db}
+    username:          ${SPRING_DATASOURCE_USERNAME:postgres}
+    password:          ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -27,15 +29,33 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
-    enabled:   true
-    locations: classpath:db/migration
+    enabled:             true
+    locations:           classpath:db/migration
     validate-on-migrate: false
 
   web:
     resources:
       static-locations: classpath:/static/
 
-  # ── Email (Gmail SMTP) ──────────────────────────────────────────
+  # ── Kafka ─────────────────────────────────────────────────────────
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    producer:
+      key-serializer:   org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks:    all
+      retries: 3
+      properties:
+        enable.idempotence: true
+    consumer:
+      group-id:           stayfinder-notification-group
+      key-deserializer:   org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset:  earliest
+      properties:
+        spring.json.trusted.packages: "com.stayfinder.kafka"
+
+  # ── Email (Gmail SMTP) ─────────────────────────────────────────────
   mail:
     host:     smtp.gmail.com
     port:     587
@@ -44,36 +64,37 @@ spring:
     properties:
       mail:
         smtp:
-          auth:            true
+          auth:     true
           starttls:
             enable:   true
             required: true
         debug: false
 
-# ── JWT ─────────────────────────────────────────────────────────────
+# ── JWT ───────────────────────────────────────────────────────────────
 jwt:
-  secret:             ${JWT_SECRET:stayfinder-super-secret-jwt-key-256-bits-long-change-in-prod}
+  secret:             ${JWT_SECRET}
   expiration:         86400000
   refresh-expiration: 604800000
 
-# ── StayFinder ───────────────────────────────────────────────────────
+# ── StayFinder ────────────────────────────────────────────────────────
 stayfinder:
   cors:
     allowed-origins: "http://localhost:3000,http://localhost:80,http://localhost,http://localhost:5500,http://127.0.0.1:5500,http://localhost:8080,http://127.0.0.1:3000,http://localhost:63342,http://127.0.0.1:63342,http://localhost:5173,http://localhost:4200,https://stayfinder-frontend-8cxm.onrender.com"
-  service-fee-percent: 12
+  service-fee-percent:  12
   cleaning-fee-default: 800
   frontend-url: ${FRONTEND_URL:https://stayfinder-frontend-8cxm.onrender.com}
   mail:
-    enabled: ${MAIL_ENABLED:true}   # set to false to disable emails during dev/testing
-    from:    ${MAIL_FROM:StayFinder <noreply@stayfinder.com>}
+    enabled:   ${MAIL_ENABLED:true}
+    from:      ${MAIL_FROM}
+    from-name: ${MAIL_FROM_NAME:StayFinder}
 
-# ── Google Gemini AI ─────────────────────────────────────────────────
+# ── Google Gemini AI ──────────────────────────────────────────────────
 gemini:
   api:
     key:     ${GEMINI_API_KEY}
     enabled: ${GEMINI_ENABLED:true}
 
-# ── Actuator ────────────────────────────────────────────────────────
+# ── Actuator ──────────────────────────────────────────────────────────
 management:
   health:
     mail:
@@ -83,19 +104,20 @@ management:
       exposure:
         include: health,info
 
-# ── SpringDoc / Swagger ──────────────────────────────────────────────
+# ── SpringDoc / Swagger ───────────────────────────────────────────────
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
   api-docs:
     path: /v3/api-docs
-# ── Logging ─────────────────────────────────────────────────────────
+
+# ── Logging ───────────────────────────────────────────────────────────
 logging:
   level:
-    com.stayfinder:              INFO
+    com.stayfinder:               INFO
     org.springframework.security: WARN
     org.springframework.web.socket: WARN
-    org.springframework.mail:    WARN
+    org.springframework.mail:     INFO
   pattern:
     console: "%clr(%d{HH:mm:ss.SSS}){faint} %clr([%thread]){magenta} %clr(%-5level){highlight} %clr(%logger{36}){cyan} %clr([%X{requestId}]){yellow} - %msg%n"

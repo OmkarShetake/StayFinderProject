@@ -1,13 +1,13 @@
-version: '3.9'
-
 services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────
   postgres:
     image: postgres:15-alpine
     container_name: stayfinder-db
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER:     postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: stayfinder_db
+      POSTGRES_DB:       stayfinder_db
     ports:
       - "5432:5432"
     volumes:
@@ -19,18 +19,61 @@ services:
       timeout: 5s
       retries: 5
 
+  # ── Kafka (KRaft mode — no Zookeeper needed) ────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: stayfinder-kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      # KRaft: this node is both controller and broker
+      KAFKA_NODE_ID:                          1
+      KAFKA_PROCESS_ROLES:                    broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS:         1@kafka:9093
+
+      # Listeners — internal broker traffic on 9092, controller on 9093
+      KAFKA_LISTENERS:                        PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS:             PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:   PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES:        CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME:       PLAINTEXT
+
+      # Single-node defaults
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR:         1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR:             1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE:                "false"
+      KAFKA_LOG_RETENTION_HOURS:                      168
+
+      # Required for KRaft: unique cluster ID (generate once, keep fixed)
+      CLUSTER_ID:                             "MkU3OEVBNTcwNTJENDM2Qg"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  # ── Spring Boot Backend ─────────────────────────────────────────
   backend:
     build: ./backend
     container_name: stayfinder-backend
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/stayfinder_db
+      SPRING_DATASOURCE_URL:      jdbc:postgresql://postgres:5432/stayfinder_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      JWT_SECRET: stayfinder-super-secret-jwt-key-256-bits-long-change-in-prod
+      JWT_SECRET:                 stayfinder-super-secret-jwt-key-256-bits-long-change-in-prod
+      KAFKA_BOOTSTRAP_SERVERS:    kafka:9092
     depends_on:
       postgres:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     restart: on-failure
     healthcheck:
@@ -38,8 +81,9 @@ services:
       interval: 15s
       timeout: 10s
       retries: 5
-      start_period: 45s
+      start_period: 60s
 
+  # ── nginx Frontend ──────────────────────────────────────────────
   frontend:
     image: nginx:alpine
     container_name: stayfinder-frontend
@@ -55,3 +99,4 @@ services:
 
 volumes:
   postgres_data:
+  kafka_data:
