@@ -39,7 +39,7 @@ spring:
 
   # ── Kafka ─────────────────────────────────────────────────────────
   kafka:
-    enabled:           ${KAFKA_ENABLED:true}
+    enabled:           ${KAFKA_ENABLED:false}
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
     producer:
       key-serializer:   org.apache.kafka.common.serialization.StringSerializer

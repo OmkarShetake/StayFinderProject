@@ -6,7 +6,6 @@ import com.stayfinder.entity.Property.PropertyStatus;
 import com.stayfinder.exception.StayFinderException;
 import com.stayfinder.repository.*;
 import com.stayfinder.kafka.NotificationEvent;
-import com.stayfinder.kafka.NotificationEventProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,7 +33,6 @@ public class PropertyService {
     private final ReviewRepository reviewRepository;
     private final BookingRepository bookingRepository;
     private final NotificationService notificationService;
-    private final NotificationEventProducer kafkaProducer;
     private final GeminiAIService geminiAIService;
 
     @Transactional
@@ -170,7 +168,7 @@ public class PropertyService {
         p.setStatus(PropertyStatus.APPROVED);
         propertyRepository.save(p);
 
-        kafkaProducer.publish(NotificationEvent.builder()
+        notificationService.publishEvent(NotificationEvent.builder()
                 .userId(p.getHost().getId())
                 .userEmail(p.getHost().getEmail())
                 .userFullName(p.getHost().getFullName())
@@ -192,7 +190,7 @@ public class PropertyService {
         p.setStatus(PropertyStatus.REJECTED);
         propertyRepository.save(p);
 
-        kafkaProducer.publish(NotificationEvent.builder()
+        notificationService.publishEvent(NotificationEvent.builder()
                 .userId(p.getHost().getId())
                 .userEmail(p.getHost().getEmail())
                 .userFullName(p.getHost().getFullName())
@@ -212,8 +210,8 @@ public class PropertyService {
         Property p = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new StayFinderException("Property not found"));
 
-        // Notify host via Kafka before deleting
-        kafkaProducer.publish(NotificationEvent.builder()
+        // Notify host via Kafka/direct before deleting
+        notificationService.publishEvent(NotificationEvent.builder()
                 .userId(p.getHost().getId())
                 .userEmail(p.getHost().getEmail())
                 .userFullName(p.getHost().getFullName())

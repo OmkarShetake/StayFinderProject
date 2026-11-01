@@ -4,7 +4,6 @@ import com.stayfinder.dto.ReviewDTOs.*;
 import com.stayfinder.entity.*;
 import com.stayfinder.exception.StayFinderException;
 import com.stayfinder.kafka.NotificationEvent;
-import com.stayfinder.kafka.NotificationEventProducer;
 import com.stayfinder.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,7 +23,6 @@ public class ReviewService {
     private final PropertyRepository  propertyRepository;
     private final PropertyService     propertyService;
     private final NotificationService notificationService;
-    private final NotificationEventProducer kafkaProducer;
 
     @Transactional
     public ReviewResponse createReview(CreateReviewRequest req, Long guestId) {
@@ -81,7 +79,7 @@ public class ReviewService {
                 .rating(overall.toPlainString())
                 .build();
 
-        kafkaProducer.publish(event);
+        notificationService.publishEvent(event);
         return ReviewResponse.from(review);
     }
 

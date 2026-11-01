@@ -29,7 +29,7 @@ public class NotificationService {
     private final Optional<NotificationEventProducer> kafkaProducer;
     private final EmailService emailService;
 
-    @Value("${spring.kafka.enabled:true}")
+    @Value("${spring.kafka.enabled:false}")
     private boolean kafkaEnabled;
 
     // ─────────────────────────────────────────────────────────────────
@@ -115,6 +115,32 @@ public class NotificationService {
                             totalAmount != null ? totalAmount : "",
                             bookingReference
                     );
+                } catch (Exception ex) {
+                    log.error("Direct email dispatch failed: {}", ex.getMessage());
+                }
+            }
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Generic event publisher — publishes to Kafka if available,
+    // otherwise persists directly and dispatches email synchronously.
+    // ─────────────────────────────────────────────────────────────────
+    public void publishEvent(NotificationEvent event) {
+        if (kafkaEnabled && kafkaProducer.isPresent()) {
+            kafkaProducer.get().publish(event);
+            log.debug("Published Kafka event type={} userId={}", event.getType(), event.getUserId());
+        } else {
+            createAndSendFromKafka(event.getUserId(), event.getTitle(), event.getMessage(), event.getType(), event.getReferenceId());
+            if (event.getUserEmail() != null && !event.getUserEmail().isBlank()) {
+                try {
+                    if ("PROPERTY_APPROVED".equals(event.getType())) {
+                        emailService.sendPropertyApproved(event.getUserEmail(), event.getUserFullName(), event.getPropertyTitle());
+                    } else if ("PROPERTY_REJECTED".equals(event.getType())) {
+                        emailService.sendPropertyRejected(event.getUserEmail(), event.getUserFullName(), event.getPropertyTitle());
+                    } else if ("NEW_REVIEW".equals(event.getType())) {
+                        emailService.sendNewReview(event.getUserEmail(), event.getUserFullName(), event.getPropertyTitle(), event.getGuestName(), event.getRating());
+                    }
                 } catch (Exception ex) {
                     log.error("Direct email dispatch failed: {}", ex.getMessage());
                 }

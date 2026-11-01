@@ -18,7 +18,7 @@ import static com.stayfinder.config.KafkaConfig.TOPIC_NOTIFICATIONS;
  * for the same user land on the same partition — preserving order.
  */
 @Component
-@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = false)
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationEventProducer {

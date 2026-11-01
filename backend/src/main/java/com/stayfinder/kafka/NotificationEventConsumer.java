@@ -23,7 +23,7 @@ import static com.stayfinder.config.KafkaConfig.TOPIC_NOTIFICATIONS;
  * up to 3 times with 2s backoff before sending to DLT.
  */
 @Component
-@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = false)
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationEventConsumer {

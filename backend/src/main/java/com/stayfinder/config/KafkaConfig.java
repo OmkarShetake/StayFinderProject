@@ -29,7 +29,7 @@ import java.util.Map;
  *   1 replica     → single-node dev / cloud managed
  */
 @Configuration
-@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = false)
 public class KafkaConfig {
 
     /** Centralised topic name — never hardcode elsewhere */
