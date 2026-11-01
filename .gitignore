@@ -5,6 +5,8 @@ target/
 
 # Node
 node_modules/
+dist/
+.vite/
 
 # IDE
 .idea/

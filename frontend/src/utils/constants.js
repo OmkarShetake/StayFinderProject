@@ -1,0 +1,115 @@
+/* ── StayFinder Constants ────────────────────────────────────────── */
+
+export const CITIES = [
+  { name: 'Mumbai', state: 'Maharashtra', icon: '🏙' },
+  { name: 'Goa', state: 'Goa', icon: '🏖' },
+  { name: 'Manali', state: 'Himachal Pradesh', icon: '🏔' },
+  { name: 'Jaipur', state: 'Rajasthan', icon: '🏰' },
+  { name: 'Udaipur', state: 'Rajasthan', icon: '🌊' },
+  { name: 'Bangalore', state: 'Karnataka', icon: '🏙' },
+  { name: 'Shimla', state: 'Himachal Pradesh', icon: '🏔' },
+  { name: 'Rishikesh', state: 'Uttarakhand', icon: '🌿' },
+  { name: 'New Delhi', state: 'Delhi', icon: '🏙' },
+  { name: 'Pune', state: 'Maharashtra', icon: '🏙' },
+  { name: 'Hyderabad', state: 'Telangana', icon: '🏙' },
+  { name: 'Coorg', state: 'Karnataka', icon: '🌿' },
+  { name: 'Srinagar', state: 'J&K', icon: '🌊' },
+  { name: 'Alappuzha', state: 'Kerala', icon: '🌊' },
+  { name: 'Wayanad', state: 'Kerala', icon: '🌿' },
+  { name: 'Jodhpur', state: 'Rajasthan', icon: '🏰' },
+  { name: 'Mysore', state: 'Karnataka', icon: '🏰' },
+  { name: 'Nashik', state: 'Maharashtra', icon: '🌿' },
+  { name: 'Bhuj', state: 'Gujarat', icon: '🌿' },
+  { name: 'Pondicherry', state: 'Puducherry', icon: '🏖' },
+];
+
+export const CITY_COORDS = {
+  mumbai: [19.076, 72.8777],
+  goa: [15.2993, 74.124],
+  manali: [32.2396, 77.1887],
+  jaipur: [26.9124, 75.7873],
+  udaipur: [24.5854, 73.6836],
+  bangalore: [12.9716, 77.5946],
+  bengaluru: [12.9716, 77.5946],
+  shimla: [31.1048, 77.1734],
+  rishikesh: [30.0869, 78.2676],
+  'new delhi': [28.6139, 77.209],
+  delhi: [28.6139, 77.209],
+  pune: [18.5204, 73.8567],
+  hyderabad: [17.385, 78.4867],
+  coorg: [12.3375, 75.8069],
+  srinagar: [34.0837, 74.7973],
+  alappuzha: [9.4981, 76.3388],
+  wayanad: [11.6854, 76.132],
+  jodhpur: [26.2389, 73.0243],
+  mysore: [12.2958, 76.6394],
+  nashik: [19.9975, 73.7898],
+  bhuj: [23.242, 69.6669],
+  pondicherry: [11.9416, 79.8083],
+  kolkata: [22.5726, 88.3639],
+  chennai: [13.0827, 80.2707],
+  ahmedabad: [23.0225, 72.5714],
+  kochi: [9.9312, 76.2673],
+  thiruvananthapuram: [8.5241, 76.9366],
+  canacona: [15.01, 74.0232],
+  banjar: [31.634, 77.359],
+  kaza: [32.2273, 78.0718],
+};
+
+export const AMENITY_ICONS = {
+  WIFI: '📶',
+  AC: '❄️',
+  KITCHEN: '🍳',
+  TV: '📺',
+  PARKING: '🅿️',
+  POOL: '🏊',
+  GYM: '💪',
+  SEA_VIEW: '🌊',
+  WASHER: '🫧',
+  IRON: '🧹',
+  BALCONY: '🏙️',
+  BBQ: '🔥',
+  PET_FRIENDLY: '🐾',
+  WORKSPACE: '💼',
+  HOT_TUB: '🛁',
+};
+
+export const CATEGORIES = [
+  { key: '', label: 'All homes', icon: '🏠' },
+  { key: 'BEACH', label: 'Beach', icon: '🏖' },
+  { key: 'MOUNTAIN', label: 'Mountain', icon: '🏔' },
+  { key: 'CITY', label: 'City', icon: '🏙' },
+  { key: 'COUNTRYSIDE', label: 'Countryside', icon: '🌿' },
+  { key: 'LAKEFRONT', label: 'Lakefront', icon: '🌊' },
+  { key: 'UNIQUE', label: 'Unique', icon: '🛖' },
+  { key: 'HERITAGE', label: 'Heritage', icon: '🏰' },
+  { key: 'CAMPING', label: 'Camping', icon: '🏕' },
+];
+
+export const CATEGORY_ICONS = {
+  BEACH: '🏖',
+  MOUNTAIN: '🏔',
+  CITY: '🏙',
+  COUNTRYSIDE: '🌿',
+  LAKEFRONT: '🌊',
+  UNIQUE: '🛖',
+  HERITAGE: '🏰',
+  CAMPING: '🏕',
+};
+
+export const CATEGORY_COLORS = {
+  BEACH: '#E2E0C3',
+  MOUNTAIN: '#C3D5E2',
+  CITY: '#E2C3D4',
+  COUNTRYSIDE: '#D4E2C3',
+  LAKEFRONT: '#C3E2D4',
+  UNIQUE: '#E2D5C3',
+  HERITAGE: '#E2D4C3',
+  CAMPING: '#E2E4C3',
+};
+
+export const CLOUDINARY_CONFIG = {
+  cloudName: 'dqyd6hpko',
+  uploadPreset: 'StayFinderUploads',
+  uploadUrl: 'https://api.cloudinary.com/v1_1/dqyd6hpko/image/upload',
+};
