@@ -2,6 +2,7 @@ package com.stayfinder.kafka;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import static com.stayfinder.config.KafkaConfig.TOPIC_NOTIFICATIONS;
  * for the same user land on the same partition — preserving order.
  */
 @Component
+@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationEventProducer {

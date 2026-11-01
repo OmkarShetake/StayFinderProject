@@ -4,6 +4,7 @@ import com.stayfinder.service.EmailService;
 import com.stayfinder.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
@@ -22,6 +23,7 @@ import static com.stayfinder.config.KafkaConfig.TOPIC_NOTIFICATIONS;
  * up to 3 times with 2s backoff before sending to DLT.
  */
 @Component
+@ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationEventConsumer {

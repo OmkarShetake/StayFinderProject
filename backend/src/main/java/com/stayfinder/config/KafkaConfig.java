@@ -21,14 +21,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Kafka configuration — KRaft mode (no Zookeeper).
+ * Kafka configuration — supports both local KRaft (no ZooKeeper) and Cloud Kafka (Confluent Cloud / Aiven SASL_SSL).
  *
  * Topic: stayfinder.notifications
  *   3 partitions  → 3 consumer threads run in parallel
  *   Key = userId  → events for same user land on same partition (ordered)
- *   1 replica     → single-node dev; raise to 3 in production
+ *   1 replica     → single-node dev / cloud managed
  */
 @Configuration
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "spring.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class KafkaConfig {
 
     /** Centralised topic name — never hardcode elsewhere */
@@ -36,6 +37,47 @@ public class KafkaConfig {
 
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
+
+    @Value("${KAFKA_SASL_USERNAME:${spring.kafka.properties.sasl.username:}}")
+    private String saslUsername;
+
+    @Value("${KAFKA_SASL_PASSWORD:${spring.kafka.properties.sasl.password:}}")
+    private String saslPassword;
+
+    @Value("${spring.kafka.properties.security.protocol:}")
+    private String securityProtocol;
+
+    @Value("${spring.kafka.properties.sasl.mechanism:PLAIN}")
+    private String saslMechanism;
+
+    @Value("${spring.kafka.properties.sasl.jaas.config:}")
+    private String saslJaasConfig;
+
+    private void applySaslConfig(Map<String, Object> config) {
+        if (saslUsername != null && !saslUsername.isBlank() && saslPassword != null && !saslPassword.isBlank()) {
+            config.put("security.protocol", "SASL_SSL");
+            String mechanism = (saslMechanism != null && !saslMechanism.isBlank()) ? saslMechanism.toUpperCase() : "PLAIN";
+            config.put("sasl.mechanism", mechanism);
+            config.put("ssl.endpoint.identification.algorithm", "https");
+
+            String loginModule = mechanism.contains("SCRAM")
+                ? "org.apache.kafka.common.security.scram.ScramLoginModule"
+                : "org.apache.kafka.common.security.plain.PlainLoginModule";
+
+            config.put("sasl.jaas.config", String.format(
+                "%s required username=\"%s\" password=\"%s\";",
+                loginModule, saslUsername.trim(), saslPassword.trim()
+            ));
+        } else if (securityProtocol != null && !securityProtocol.isBlank()) {
+            config.put("security.protocol", securityProtocol);
+            if (saslMechanism != null && !saslMechanism.isBlank()) {
+                config.put("sasl.mechanism", saslMechanism);
+            }
+            if (saslJaasConfig != null && !saslJaasConfig.isBlank()) {
+                config.put("sasl.jaas.config", saslJaasConfig);
+            }
+        }
+    }
 
     /* ── Topic definition ─────────────────────────────────────────── */
     @Bean
@@ -56,6 +98,7 @@ public class KafkaConfig {
         config.put(ProducerConfig.ACKS_CONFIG,                   "all");
         config.put(ProducerConfig.RETRIES_CONFIG,                3);
         config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,     true);
+        applySaslConfig(config);
         return new DefaultKafkaProducerFactory<>(config);
     }
 
@@ -76,10 +119,9 @@ public class KafkaConfig {
         config.put(ConsumerConfig.GROUP_ID_CONFIG,                 "stayfinder-notification-group");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,   StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
-        // Read only committed offsets — never process uncommitted messages
         config.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG,          "read_committed");
-        // earliest: on first start, consume all existing messages from the beginning
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,        "earliest");
+        applySaslConfig(config);
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
     }
 
@@ -88,9 +130,7 @@ public class KafkaConfig {
     kafkaListenerContainerFactory() {
         var factory = new ConcurrentKafkaListenerContainerFactory<String, NotificationEvent>();
         factory.setConsumerFactory(consumerFactory());
-        // 3 concurrent threads match the 3 topic partitions
         factory.setConcurrency(3);
-        // Retry up to 3 times with 2s backoff before sending to Dead Letter Topic
         factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(2000L, 3L)));
         return factory;
     }
