@@ -23,10 +23,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Use same CORS origins as REST API for security
+        // Use allowedOriginPatterns to support universal wildcard matching with credentials
         String[] origins = allowedOrigins.split(",");
         registry.addEndpoint("/ws")
-                .setAllowedOrigins(origins)
+                .setAllowedOriginPatterns(origins)
                 .withSockJS();
     }
 }
