@@ -60,8 +60,8 @@ spring:
   mail:
     host:     smtp.gmail.com
     port:     587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -86,13 +86,13 @@ stayfinder:
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
   mail:
     enabled:   ${MAIL_ENABLED:true}
-    from:      ${MAIL_FROM}
+    from:      ${MAIL_FROM:${MAIL_USERNAME:stayfinder@gmail.com}}
     from-name: ${MAIL_FROM_NAME:StayFinder}
 
 # ── Google Gemini AI ──────────────────────────────────────────────────
 gemini:
   api:
-    key:     ${GEMINI_API_KEY}
+    key:     ${GEMINI_API_KEY:}
     enabled: ${GEMINI_ENABLED:true}
 
 # ── Actuator ──────────────────────────────────────────────────────────
